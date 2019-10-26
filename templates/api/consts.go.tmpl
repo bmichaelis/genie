@@ -1,0 +1,8 @@
+package api
+
+import "flag"
+
+var (
+	HttpAddr = flag.String("HELLOWORLD_HTTP_ADDR", ":21000", "HTTP address")
+	GrpcAddr = flag.String("HELLOWORLD_GRPC_ADDR", ":21001", "gRPC address")
+)

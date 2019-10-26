@@ -1,0 +1,7 @@
+version: '3'
+services:
+  app:
+    build: .
+    ports:
+      - "21000:21000"
+      - "21001:21001"
