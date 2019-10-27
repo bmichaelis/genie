@@ -1,8 +1,11 @@
 package internal
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"reflect"
+	"regexp"
 	"strings"
 )
 
@@ -38,6 +41,18 @@ func getSourceDirectory() string {
 		targetPath = cwd
 	}
 	return targetPath
+}
+
+func (a *Answers) PackageName(val interface{}) error {
+	value := reflect.ValueOf(val)
+	invalid, err := regexp.MatchString("[\\W0-9A-Z]+", value.String())
+	if err != nil {
+		return err
+	}
+	if invalid {
+		return errors.New("package name can only contain lowercase letters and underscores")
+	}
+	return nil
 }
 
 func (a *Answers) ServicePath() string {

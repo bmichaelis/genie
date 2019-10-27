@@ -1,4 +1,4 @@
-module grpcgen
+module genny
 
 go 1.13
 

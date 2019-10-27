@@ -3,10 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"genny/internal"
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/janeczku/go-spinner"
-	"grpcgen/internal"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -29,14 +29,14 @@ func askQuestions() *internal.Answers {
 	answers := internal.NewAnswers()
 
 	if err := survey.AskOne(&survey.Input{
-		Message: "What namespace is this service under? (ex. github.com/myrepo). Leave empty to skip.",
+		Message: "Namespace? (ex. github.com/myrepo). Leave empty to skip.",
 	}, &answers.Namespace); err != nil {
 		panic(err)
 	}
 
 	if err := survey.AskOne(&survey.Input{
-		Message: "Name of package?",
-	}, &answers.Package, survey.WithValidator(survey.Required)); err != nil {
+		Message: "Package name?",
+	}, &answers.Package, survey.WithValidator(survey.Required), survey.WithValidator(answers.PackageName)); err != nil {
 		panic(err)
 	}
 
@@ -48,7 +48,7 @@ func askQuestions() *internal.Answers {
 	}
 
 	if err := survey.AskOne(&survey.Input{
-		Message: "gRPC port",
+		Message: "gRPC port?",
 		Default: "8080",
 	}, &answers.GrpcPort); err != nil {
 		panic(err)
@@ -63,7 +63,7 @@ func askQuestions() *internal.Answers {
 
 	if answers.EnableHttp {
 		if err := survey.AskOne(&survey.Input{
-			Message: "HTTP port",
+			Message: "HTTP port?",
 			Default: "3000",
 		}, &answers.HttpPort); err != nil {
 			panic(err)

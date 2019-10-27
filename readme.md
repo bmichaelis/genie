@@ -6,5 +6,5 @@ Generates gRPC microservice. Provides service, client and support for http acces
 
 ```shell script
 go install
-grpcgen
+genny
 ```
