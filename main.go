@@ -20,6 +20,11 @@ const templateSuffix = ".tmpl"
 var spinnerCharSet = []string{"⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷"}
 var spinnerSpeed = time.Millisecond * 50
 
+func printHeader() {
+	header := internal.NewHeader()
+	header.Print()
+}
+
 func askQuestions() *internal.Answers {
 	answers := internal.NewAnswers()
 
@@ -40,6 +45,29 @@ func askQuestions() *internal.Answers {
 		Default: false,
 	}, &answers.DeleteDir); err != nil {
 		panic(err)
+	}
+
+	if err := survey.AskOne(&survey.Input{
+		Message: "gRPC port",
+		Default: "8080",
+	}, &answers.GrpcPort); err != nil {
+		panic(err)
+	}
+
+	if err := survey.AskOne(&survey.Confirm{
+		Message: "Enable HTTP endpoint?",
+		Default: true,
+	}, &answers.EnableHttp); err != nil {
+		panic(err)
+	}
+
+	if answers.EnableHttp {
+		if err := survey.AskOne(&survey.Input{
+			Message: "HTTP port",
+			Default: "3000",
+		}, &answers.HttpPort); err != nil {
+			panic(err)
+		}
 	}
 
 	return &answers
@@ -87,9 +115,7 @@ func generateFiles(answers *internal.Answers) {
 		}
 		defer f.Close()
 		w := bufio.NewWriter(f)
-		_ = t.Execute(w, map[string]string{
-			"Package": answers.Package,
-		})
+		_ = t.Execute(w, &answers)
 		return w.Flush()
 	})
 	if err != nil {
@@ -127,12 +153,13 @@ func goFmt() {
 }
 
 func printInstructions(answers *internal.Answers) {
-	fmt.Println("\nGeneration successful!!")
+	fmt.Println("\nService generation complete")
 	fmt.Println("------------------------------------------------")
 	fmt.Printf("cd %s; go run cmd/main.go\n\n", answers.ServicePath())
 }
 
 func main() {
+	printHeader()
 	answers := askQuestions()
 	deleteDir(answers)
 	generateFiles(answers)

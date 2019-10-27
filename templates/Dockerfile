@@ -17,5 +17,5 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o {{.Package}} cmd/{{.Packag
 # final stage
 FROM scratch
 COPY --from=builder /app/{{.Package}} /app/
-EXPOSE 21000 21001
+EXPOSE {{.GrpcPort}} {{if .EnableHttp}}{{.HttpPort}}{{end}}
 ENTRYPOINT ["/app/{{.Package}}"]

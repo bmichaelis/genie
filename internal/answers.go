@@ -7,10 +7,13 @@ import (
 )
 
 type Answers struct {
-	Source    string
-	Namespace string
-	Package   string
-	DeleteDir bool
+	Source     string
+	Namespace  string
+	Package    string
+	DeleteDir  bool
+	GrpcPort   string
+	EnableHttp bool
+	HttpPort   string
 }
 
 func getSourceDirectory() string {
