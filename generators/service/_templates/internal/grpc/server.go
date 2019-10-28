@@ -3,10 +3,10 @@ package grpc
 import (
 	"github.com/golang/glog"
 	"google.golang.org/grpc"
+	"net"
 	"{{.Package}}/api"
 	grpcService "{{.Package}}/generated"
 	"{{.Package}}/internal"
-	"net"
 )
 
 type Serverer interface {

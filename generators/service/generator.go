@@ -3,7 +3,7 @@ package service
 import (
 	"bufio"
 	"fmt"
-	"genie/internal/util"
+	"genie/util"
 	"github.com/gobuffalo/packr/v2"
 	"os"
 	"os/exec"

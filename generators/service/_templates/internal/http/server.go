@@ -5,9 +5,9 @@ import (
 	"github.com/golang/glog"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
+	"net/http"
 	"{{.Package}}/api"
 	grpcService "{{.Package}}/generated"
-	"net/http"
 )
 
 type Serverer interface {

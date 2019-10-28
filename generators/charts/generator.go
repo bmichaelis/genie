@@ -3,8 +3,8 @@ package charts
 import (
 	"bufio"
 	"fmt"
-	"genie/internal/generators"
-	"genie/internal/generators/service"
+	"genie/generators"
+	"genie/generators/service"
 	"github.com/gobuffalo/packr/v2"
 	"os"
 	"path/filepath"

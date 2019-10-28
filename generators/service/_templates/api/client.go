@@ -3,8 +3,8 @@ package api
 import (
 	"context"
 	"google.golang.org/grpc"
-	grpcService "{{.Package}}/generated"
 	"time"
+	grpcService "{{.Package}}/generated"
 )
 
 type Clienter interface {

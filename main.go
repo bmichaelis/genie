@@ -1,9 +1,9 @@
 package main
 
 import (
-	"genie/internal/generators"
-	"genie/internal/generators/charts"
-	"genie/internal/generators/service"
+	"genie/generators"
+	"genie/generators/charts"
+	"genie/generators/service"
 )
 
 func main() {
