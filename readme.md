@@ -33,7 +33,7 @@ To use, clone this repo and run the following command in your terminal
 
 ```shell script
 go install
-genny
+genie
 ```
 # Contribute
 

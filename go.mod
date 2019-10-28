@@ -1,4 +1,4 @@
-module genny
+module genie
 
 go 1.13
 

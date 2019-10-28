@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"genny/internal"
+	"genie/internal"
 	"github.com/gobuffalo/packr/v2"
 	"os"
 	"os/exec"
