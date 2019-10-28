@@ -75,14 +75,14 @@ func generateFiles(answers *internal.Responses) {
 	}
 }
 
-func changeMode() {
+func changeFileMode() {
 	cmd := exec.Command("chmod", "+x", "generate.sh")
 	if err := cmd.Run(); err != nil {
 		panic(err)
 	}
 }
 
-func goGenerate() {
+func execGoGenerate() {
 	s := terminal.ShowBusy("go generate...")
 	cmd := exec.Command("go", "generate")
 	if err := cmd.Run(); err != nil {
@@ -91,7 +91,7 @@ func goGenerate() {
 	s.Stop()
 }
 
-func goFmt() {
+func execGoFmt() {
 	s := terminal.ShowBusy("go fmt")
 	cmd := exec.Command("go", "fmt", "./...")
 	if err := cmd.Run(); err != nil {
@@ -112,8 +112,8 @@ func main() {
 	deleteDir(responses)
 	generateFiles(responses)
 	setWorkingDir(responses)
-	changeMode()
-	goGenerate()
-	goFmt()
+	changeFileMode()
+	execGoGenerate()
+	execGoFmt()
 	printInstructions(responses)
 }
