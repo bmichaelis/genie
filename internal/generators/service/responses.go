@@ -1,4 +1,4 @@
-package internal
+package service
 
 import (
 	"errors"
@@ -9,14 +9,35 @@ import (
 	"strings"
 )
 
-type Answers struct {
+type Responses struct {
 	Source     string
 	Namespace  string
 	Package    string
+	PACKAGE    string
 	DeleteDir  bool
 	GrpcPort   string
 	EnableHttp bool
 	HttpPort   string
+	//K8s        charts2.Responses
+}
+
+func (r *Responses) PackageName(val interface{}) error {
+	value := reflect.ValueOf(val)
+	invalid, err := regexp.MatchString("[\\W0-9A-Z]+", value.String())
+	if err != nil {
+		return err
+	}
+	if invalid {
+		return errors.New("package name can only contain lowercase letters and underscores")
+	}
+	return nil
+}
+
+func (r *Responses) ServicePath() string {
+	if r.Namespace == "" {
+		return strings.ToLower(fmt.Sprintf("%s/%s", r.Source, r.Package))
+	}
+	return strings.ToLower(fmt.Sprintf("%s/%s/%s", r.Source, r.Namespace, r.Package))
 }
 
 func getSourceDirectory() string {
@@ -43,27 +64,8 @@ func getSourceDirectory() string {
 	return targetPath
 }
 
-func (a *Answers) PackageName(val interface{}) error {
-	value := reflect.ValueOf(val)
-	invalid, err := regexp.MatchString("[\\W0-9A-Z]+", value.String())
-	if err != nil {
-		return err
-	}
-	if invalid {
-		return errors.New("package name can only contain lowercase letters and underscores")
-	}
-	return nil
-}
-
-func (a *Answers) ServicePath() string {
-	if a.Namespace == "" {
-		return strings.ToLower(fmt.Sprintf("%s/%s", a.Source, a.Package))
-	}
-	return strings.ToLower(fmt.Sprintf("%s/%s/%s", a.Source, a.Namespace, a.Package))
-}
-
-func NewAnswers() Answers {
-	return Answers{
+func NewResponses() *Responses {
+	return &Responses{
 		Source: getSourceDirectory(),
 	}
 }

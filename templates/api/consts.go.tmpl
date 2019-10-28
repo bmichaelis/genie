@@ -1,8 +1,0 @@
-package api
-
-import "flag"
-
-var (
-	GrpcAddr = flag.String("HELLOWORLD_GRPC_ADDR", ":{{.GrpcPort}}", "gRPC address")
-{{if .EnableHttp}}	HttpAddr = flag.String("HELLOWORLD_HTTP_ADDR", ":{{.HttpPort}}", "HTTP address"){{end}}
-)
