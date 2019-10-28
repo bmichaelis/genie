@@ -1,16 +1,16 @@
-# Genny                                                     
+# Genie                                                     
 
-Generates scaffolding for gRPC and HTTP services for Go
+Genie is an extensible service generator used to create gRPC microservices for GO
 
 ## Features
 
-Genny allows you to:
+Genie allows you to:
 
 * Choose your namespace
 * Choose the name of your package
-* Choose to enable HTTP endpoints
+* Choose to enable HTTP annotations for endpoint support
 * Choose gRPC and HTTP ports
-* Genny can be easily modified for your project needs
+* Easily add new generators
 
 The generated project contains the following:
 
@@ -18,12 +18,13 @@ The generated project contains the following:
 * Generator using Docker (no locally installed proto compiler required)
 * Best practice project layout for Go
 * gRPC client for service-to-service communication
+* Swagger file for HTTP endpoints
 * Example unit tests
 * Ready to in local docker environment using docker compose
+* (Optional) Helm charts for Kubernetes
 
 ## Roadmap
 
-* (Optional) Ready to deploy Helm charts for Kubernetes
 * (Optional) Example CRUD using Mongo database
 
 ## Usage
@@ -34,10 +35,6 @@ To use, clone this repo and run the following command in your terminal
 go install
 genie
 ```
-# Contribute
+## Contribute
 
-Feel free to fork this project to contribute other features. Here are some things to remember...
-
-1. KISS - Keep it simple
-2. Features must be optional (CRUD using different database)
-3. Features should be generic in use. 
+Feel free to fork this project to contribute other generators.
