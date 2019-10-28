@@ -11,56 +11,57 @@ type Survey struct {
 	Responses *Responses
 }
 
-func (*Survey) Start() *Responses {
+func (s *Survey) Start() *Responses {
 	color.Yellow("\nService\n------------------------------------------------------\n")
 
-	responses := NewResponses()
 	if err := survey.AskOne(&survey.Input{
 		Message: "Namespace? (ex. github.com/myrepo). Leave empty to skip.",
-	}, &responses.Namespace); err != nil {
+	}, &s.Responses.Namespace); err != nil {
 		panic(err)
 	}
 
 	if err := survey.AskOne(&survey.Input{
 		Message: "Package name?",
-	}, &responses.Package, survey.WithValidator(survey.Required), survey.WithValidator(responses.PackageName)); err != nil {
+	}, &s.Responses.Package, survey.WithValidator(survey.Required), survey.WithValidator(s.Responses.PackageName)); err != nil {
 		panic(err)
 	}
 
-	responses.PACKAGE = strings.ToUpper(responses.Package)
+	s.Responses.PACKAGE = strings.ToUpper(s.Responses.Package)
 
 	if err := survey.AskOne(&survey.Confirm{
-		Message: fmt.Sprintf("Delete directory if exists (%s)", responses.ServicePath()),
+		Message: fmt.Sprintf("Delete directory if exists (%s)", s.Responses.ServicePath()),
 		Default: false,
-	}, &responses.DeleteDir); err != nil {
+	}, &s.Responses.DeleteDir); err != nil {
 		panic(err)
 	}
 
 	if err := survey.AskOne(&survey.Input{
 		Message: "gRPC port?",
 		Default: "8080",
-	}, &responses.GrpcPort); err != nil {
+	}, &s.Responses.GrpcPort); err != nil {
 		panic(err)
 	}
 
 	if err := survey.AskOne(&survey.Confirm{
 		Message: "Enable HTTP endpoint?",
 		Default: true,
-	}, &responses.EnableHttp); err != nil {
+	}, &s.Responses.EnableHttp); err != nil {
 		panic(err)
 	}
 
-	if responses.EnableHttp {
+	if s.Responses.EnableHttp {
 		if err := survey.AskOne(&survey.Input{
 			Message: "HTTP port?",
 			Default: "3000",
-		}, &responses.HttpPort); err != nil {
+		}, &s.Responses.HttpPort); err != nil {
 			panic(err)
 		}
 	}
-	return responses
+	return s.Responses
 }
 
 func NewSurvey() *Survey {
-	return &Survey{}
+	return &Survey{
+		Responses: NewResponses(),
+	}
 }
