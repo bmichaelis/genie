@@ -26,8 +26,7 @@ func (g *Generator) GetName() string {
 }
 
 func (g *Generator) Run() {
-	questions := NewQuestions()
-	g.Responses = questions.Ask()
+	g.Responses = NewSurvey().Start()
 	if g.Responses.Enable {
 		g.writeFiles()
 	}

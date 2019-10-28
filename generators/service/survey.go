@@ -7,10 +7,11 @@ import (
 	"strings"
 )
 
-type Questions struct {
+type Survey struct {
+	Responses *Responses
 }
 
-func (*Questions) Ask() *Responses {
+func (*Survey) Start() *Responses {
 	color.Yellow("\nService\n------------------------------------------------------\n")
 
 	responses := NewResponses()
@@ -60,6 +61,6 @@ func (*Questions) Ask() *Responses {
 	return responses
 }
 
-func NewQuestions() *Questions {
-	return &Questions{}
+func NewSurvey() *Survey {
+	return &Survey{}
 }

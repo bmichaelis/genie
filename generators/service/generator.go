@@ -25,8 +25,7 @@ func (g *Generator) GetName() string {
 
 func (g *Generator) Run() {
 	g.printHeader()
-	questions := NewQuestions()
-	g.Responses = questions.Ask()
+	g.Responses = NewSurvey().Start()
 	g.deleteDir()
 	g.writeFiles()
 }

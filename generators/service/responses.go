@@ -18,7 +18,6 @@ type Responses struct {
 	GrpcPort   string
 	EnableHttp bool
 	HttpPort   string
-	//K8s        charts2.Responses
 }
 
 func (r *Responses) PackageName(val interface{}) error {

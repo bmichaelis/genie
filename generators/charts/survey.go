@@ -5,13 +5,21 @@ import (
 	"github.com/fatih/color"
 )
 
-type Questions struct {
+type Responses struct {
+	Enable         bool
+	ArtifactoryUrl string
+	Author         string
+	Email          string
 }
 
-func (*Questions) Ask() *Responses {
+type Survey struct {
+	Responses *Responses
+}
+
+func (s *Survey) Start() *Responses {
 	color.Yellow("\nCharts\n------------------------------------------------------\n")
 
-	responses := NewResponses()
+	responses := s.Responses
 	if err := survey.AskOne(&survey.Confirm{
 		Message: "Add Kubernetes Helm Charts?",
 		Default: false,
@@ -47,6 +55,8 @@ func (*Questions) Ask() *Responses {
 	return responses
 }
 
-func NewQuestions() *Questions {
-	return &Questions{}
+func NewSurvey() *Survey {
+	return &Survey{
+		Responses: &Responses{},
+	}
 }
