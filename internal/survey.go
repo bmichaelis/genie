@@ -18,6 +18,7 @@ type Responses struct {
 	Source     string
 	Namespace  string
 	Package    string
+	PACKAGE    string
 	DeleteDir  bool
 	GrpcPort   string
 	EnableHttp bool
@@ -62,6 +63,8 @@ func (s *Survey) Start() {
 	}, &responses.Package, survey.WithValidator(survey.Required), survey.WithValidator(responses.PackageName)); err != nil {
 		panic(err)
 	}
+
+	responses.PACKAGE = strings.ToUpper(responses.Package)
 
 	if err := survey.AskOne(&survey.Confirm{
 		Message: fmt.Sprintf("Delete directory if exists (%s)", responses.ServicePath()),
