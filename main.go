@@ -8,11 +8,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"text/template"
 )
-
-const templateSuffix = ".tmpl"
 
 var terminal = internal.NewTerminal()
 
@@ -43,21 +40,19 @@ func deleteDir(answers *internal.Responses) {
 	}
 }
 
-func generateFiles(answers *internal.Responses) {
-	box := packr.New("defaultService", "./templates/service/default")
+func generateDefaultService(answers *internal.Responses) {
+	box := packr.New("defaultService", "./_templates/service/default")
 	err := box.Walk(func(path string, file packr.File) error {
 		fullOutputPath := fmt.Sprintf("%s/%s", answers.ServicePath(), path)
-		if strings.Contains(fullOutputPath, templateSuffix) {
-			fullOutputPath = strings.TrimSuffix(fullOutputPath, filepath.Ext(fullOutputPath))
-		}
-
 		// create directory path
 		dir := filepath.Dir(fullOutputPath)
 		if _, err := os.Stat(fullOutputPath); os.IsNotExist(err) {
 			_ = os.MkdirAll(dir, os.ModePerm)
 		}
 
-		t, err := template.New(path).Parse(file.String())
+		content := file.String()
+
+		t, err := template.New(path).Delims("{{{", "}}}").Parse(content)
 		if err != nil {
 			return err
 		}
@@ -110,7 +105,7 @@ func main() {
 	printHeader()
 	responses := askQuestions()
 	deleteDir(responses)
-	generateFiles(responses)
+	generateDefaultService(responses)
 	setWorkingDir(responses)
 	changeFileMode()
 	execGoGenerate()

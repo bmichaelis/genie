@@ -4,11 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"github.com/golang/glog"
-	"{{.Package}}/api"
-	"{{.Package}}/internal"
-	"{{.Package}}/internal/grpc"
-	"{{.Package}}/internal/healthcheck"
-	"{{.Package}}/internal/http"
+	"{{{.Package}}}/api"
+	"{{{.Package}}}/internal"
+	"{{{.Package}}}/internal/grpc"
+	"{{{.Package}}}/internal/healthcheck"
+	"{{{.Package}}}/internal/http"
 )
 
 func main() {

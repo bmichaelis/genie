@@ -2,7 +2,7 @@ package internal
 
 import (
 	"context"
-	grpcService "{{.Package}}/generated"
+	grpcService "{{{.Package}}}/generated"
 	"log"
 )
 

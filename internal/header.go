@@ -35,6 +35,6 @@ func NewHeader() *Header {
   ███    ███   ███    ███ ███   ███ ███    ███    ███ 
   ████████▀    ██████████  ▀█   █▀  █▀     ██████████
 `
-	header.Tag = "	 *** Service Generator for Go ***"
+	header.Tag = "        *** gRPC Service Generator for Go ***"
 	return &header
 }

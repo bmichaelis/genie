@@ -5,8 +5,8 @@ import (
 	"github.com/golang/glog"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
-	"{{.Package}}/api"
-	grpcService "{{.Package}}/generated"
+	"{{{.Package}}}/api"
+	grpcService "{{{.Package}}}/generated"
 	"net/http"
 )
 

@@ -1,0 +1,4 @@
+dependencies:
+    - name: common
+      version: ~0.1.0-master
+      repository: https://tp-artifactory.vivint.com/artifactory/helm

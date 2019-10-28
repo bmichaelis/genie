@@ -26,7 +26,6 @@ The generated project contains the following:
 * (Optional) Ready to deploy Helm charts for Kubernetes
 * (Optional) Example CRUD using Mongo database
 
-
 ## Usage
 
 To use, clone this repo and run the following command in your terminal

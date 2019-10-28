@@ -1,4 +1,4 @@
-module {{.Package}}
+module {{{.Package}}}
 
 go 1.13
 

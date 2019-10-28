@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 	"google.golang.org/grpc"
-	grpcService "{{.Package}}/generated"
+	grpcService "{{{.Package}}}/generated"
 	"time"
 )
 

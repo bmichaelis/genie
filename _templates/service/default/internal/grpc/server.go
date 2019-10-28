@@ -3,9 +3,9 @@ package grpc
 import (
 	"github.com/golang/glog"
 	"google.golang.org/grpc"
-	"{{.Package}}/api"
-	grpcService "{{.Package}}/generated"
-	"{{.Package}}/internal"
+	"{{{.Package}}}/api"
+	grpcService "{{{.Package}}}/generated"
+	"{{{.Package}}}/internal"
 	"net"
 )
 
