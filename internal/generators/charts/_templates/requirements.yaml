@@ -1,0 +1,4 @@
+#dependencies:
+#    - name: common
+#      version: <VERSION_HERE>
+#      repository: <PATH_TO_ARTIFACTORY_HERE>
