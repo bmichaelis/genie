@@ -28,9 +28,9 @@ spec:
         - name: {{ $key }}
           value: {{ $value | quote }}
         {{- end }}
-        - name: {{{.Service.PackageUpper}}}_CONFIG_PROFILE
+        - name: {{{.service.PackageUpper}}}_CONFIG_PROFILE
           value: {{ .Release.Namespace | lower }}
-        - name: {{{.Service.PackageUpper}}}_GO_CONFIGS
+        - name: {{{.service.PackageUpper}}}_GO_CONFIGS
           value: /config
         imagePullPolicy: IfNotPresent
         resources:

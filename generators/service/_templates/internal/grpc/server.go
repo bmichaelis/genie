@@ -4,12 +4,12 @@ import (
 	"github.com/golang/glog"
 	"google.golang.org/grpc"
 	"net"
-	"{{.Package}}/api"
-	service "{{.Package}}/generated"
+	"{{ .service.Package }}/api"
+	service "{{ .service.Package }}/generated"
 )
 
 type Serverer interface {
-	Serve(server service.{{ .Service }}Server) error
+	Serve(server service.{{ .service.Service }}Server) error
 	Server() *grpc.Server
 }
 
@@ -24,7 +24,7 @@ func (s *Server) Server() *grpc.Server {
 	return s.gs
 }
 
-func (s *Server) Serve(server service.{{ .Service }}Server) error {
+func (s *Server) Serve(server service.{{ .service.Service }}Server) error {
 	defer glog.Flush()
 
 	lis, err := net.Listen("tcp", *api.GrpcAddr)
@@ -32,7 +32,7 @@ func (s *Server) Serve(server service.{{ .Service }}Server) error {
 		return err
 	}
 
-	service.Register{{.Service}}Server(s.Server(), server)
+	service.Register{{ .service.Service }}Server(s.Server(), server)
 
 	return s.Server().Serve(lis)
 }

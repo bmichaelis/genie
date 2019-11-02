@@ -2,12 +2,16 @@ package internal
 
 import (
 	"context"
-	service "{{.Package}}/generated"
+	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/golang/protobuf/ptypes/wrappers"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	service "{{ .service.Package }}/generated"
 	"log"
 )
 
 type Server struct {
-	service.{{.Service}}Server
+	service.{{ .service.Service }}Server
 }
 
 func (s *Server) SayHello(ctx context.Context, req *service.HelloRequest) (*service.HelloReply, error) {
@@ -19,6 +23,6 @@ func (s *Server) SayHello(ctx context.Context, req *service.HelloRequest) (*serv
 	return &service.HelloReply{Message: "Hello, " + name}, nil
 }
 
-func NewServer() service.{{ .Service }}Server {
+func NewServer() service.{{ .service.Service }}Server {
 	return &Server{}
 }

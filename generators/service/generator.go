@@ -84,7 +84,9 @@ func (g *Generator) writeFiles() {
 		}
 		defer f.Close()
 		w := bufio.NewWriter(f)
-		_ = t.Execute(w, &responses)
+		_ = t.Execute(w, map[string]interface{}{
+			"service": g.Responses,
+		})
 		return w.Flush()
 	})
 	if err != nil {

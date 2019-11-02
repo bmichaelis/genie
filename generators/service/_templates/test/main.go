@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/golang/glog"
-	"{{.Package}}/api"
-	service "{{.Package}}/generated"
+	"{{ .service.Package }}/api"
+	service "{{ .service.Package }}/generated"
 )
 
 func main() {

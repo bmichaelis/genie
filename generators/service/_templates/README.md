@@ -6,14 +6,14 @@
 
 ```shell script
 go mod download
-go run cmd/{{.Package}}/main.go
+go run cmd/{{ .service.Package }}/main.go
 ```
 
 ### Running as docker comtainer
 
 ```shell script
-docker build -t {{.Package}} .
-docker run {{.Package}}
+docker build -t {{ .service.Package }} .
+docker run {{ .service.Package }}
 ```
 
 ### Running with docker-compose
@@ -29,11 +29,11 @@ Be sure the service is running
 ```shell script
 go run test/main.go
 ```
-{{if .EnableHttp}}
+{{if .service.EnableHttp }}
 ### Testing with curl
 
 ```shell script
-curl http://localhost:{{.HttpPort}}/v1/users/hello?name=world
+curl http://localhost:{{ .service.HttpPort }}/v1/users/hello?name=world
 ```
 {{end}}
 
