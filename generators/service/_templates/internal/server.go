@@ -2,27 +2,23 @@ package internal
 
 import (
 	"context"
-	grpcService "{{.Package}}/generated"
+	service "{{.Package}}/generated"
 	"log"
 )
 
-type Serverer interface {
-	SayHello(ctx context.Context, in *grpcService.HelloRequest) (*grpcService.HelloReply, error)
-}
-
 type Server struct {
-	grpcService.GreeterServer
+	service.{{.Service}}Server
 }
 
-func (s *Server) SayHello(ctx context.Context, in *grpcService.HelloRequest) (*grpcService.HelloReply, error) {
-	log.Printf("Received: %v", in.GetName())
-	name := in.GetName()
+func (s *Server) SayHello(ctx context.Context, req *service.HelloRequest) (*service.HelloReply, error) {
+	log.Printf("Received: %v", req.GetName())
+	name := req.GetName()
 	if name == "" {
-		name = grpcService.HelloRequest_world.String()
+		name = service.HelloRequest_world.String()
 	}
-	return &grpcService.HelloReply{Message: "Hello, " + name}, nil
+	return &service.HelloReply{Message: "Hello, " + name}, nil
 }
 
-func NewServer() Serverer {
+func NewServer() service.{{ .Service }}Server {
 	return &Server{}
 }

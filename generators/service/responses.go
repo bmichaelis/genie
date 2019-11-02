@@ -10,14 +10,16 @@ import (
 )
 
 type Responses struct {
-	Source     string
-	Namespace  string
-	Package    string
-	PACKAGE    string
-	DeleteDir  bool
-	GrpcPort   string
-	EnableHttp bool
-	HttpPort   string
+	Source       string
+	Namespace    string
+	Package      string
+	PackageUpper string
+	Service      string
+	ServiceLower string
+	DeleteDir    bool
+	GrpcPort     string
+	EnableHttp   bool
+	HttpPort     string
 }
 
 func (r *Responses) PackageName(val interface{}) error {

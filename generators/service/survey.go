@@ -25,8 +25,16 @@ func (s *Survey) Start() *Responses {
 	}, &s.Responses.Package, survey.WithValidator(survey.Required), survey.WithValidator(s.Responses.PackageName)); err != nil {
 		panic(err)
 	}
+	s.Responses.Package = strings.ToLower(s.Responses.Package)
+	s.Responses.PackageUpper = strings.ToUpper(s.Responses.Package)
 
-	s.Responses.PACKAGE = strings.ToUpper(s.Responses.Package)
+	if err := survey.AskOne(&survey.Input{
+		Message: "Service name? (ex. Users)",
+	}, &s.Responses.Service, survey.WithValidator(survey.Required)); err != nil {
+		panic(err)
+	}
+	s.Responses.Service = strings.Title(s.Responses.Service)
+	s.Responses.ServiceLower = strings.ToLower(s.Responses.Service)
 
 	if err := survey.AskOne(&survey.Confirm{
 		Message: fmt.Sprintf("Delete directory if exists (%s)", s.Responses.ServicePath()),

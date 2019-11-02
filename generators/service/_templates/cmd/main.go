@@ -16,13 +16,13 @@ func main() {
 
 	flag.Parse()
 
-	greeterServer := internal.NewServer()
+	server := internal.NewServer()
 
 	grpcServer := grpc.NewServer()
 	go func() {
 		fmt.Printf("Listening to gRPC on %s\n", *api.GrpcAddr)
 
-		if err := grpcServer.Serve(greeterServer); err != nil {
+		if err := grpcServer.Serve(server); err != nil {
 			glog.Fatalln(err)
 			<-shutdown
 		}

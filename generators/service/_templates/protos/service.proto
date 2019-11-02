@@ -1,15 +1,17 @@
 syntax = "proto3";
-package grpcService;
+package {{ .Package }};
 
 import "google/api/annotations.proto";
 
 // The greeting service definition.
-service Greeter {
+service {{ .Service }} {
     // Sends a greeting
     rpc SayHello (HelloRequest) returns (HelloReply) {
+        {{ if .EnableHttp }}
         option (google.api.http) = {
-            get: "/api/{{.Package}}/hello"
+            get: "/api/{{.ServiceLower}}/hello"
         };
+        {{ end }}
     }
 }
 

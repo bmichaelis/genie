@@ -33,7 +33,7 @@ go run test/main.go
 ### Testing with curl
 
 ```shell script
-curl http://localhost:{{.HttpPort}}/v1/grpcService/hello?name=world
+curl http://localhost:{{.HttpPort}}/v1/users/hello?name=world
 ```
 {{end}}
 
@@ -48,7 +48,7 @@ curl http://localhost:{{.HttpPort}}/v1/grpcService/hello?name=world
 * https://github.com/znly/docker-protobuf
 * https://github.com/grpc-ecosystem/grpc-gateway
 * https://medium.com/@lchenn/generate-grpc-and-protobuf-libraries-with-containers-c15ba4e4f3ad
-* https://github.com/grpc/grpc-go/blob/master/grpcServices/{{.Package}}/greeter_client/main.go
+* https://github.com/grpc/grpc-go/blob/master/examples/helloworld/greeter_client/main.go
 * https://grpc.io/docs/quickstart/go/
 * https://grpc.io/docs/tutorials/basic/go/
 * https://github.com/gogo/protobuf

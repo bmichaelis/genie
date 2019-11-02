@@ -4,7 +4,7 @@ import (
 	"context"
 	"google.golang.org/grpc"
 	"time"
-	grpcService "{{.Package}}/generated"
+	service "{{.Package}}/generated"
 )
 
 type Clienter interface {
@@ -15,7 +15,7 @@ type Clienter interface {
 
 type Client struct {
 	Connection    *grpc.ClientConn
-	GreeterClient grpcService.GreeterClient
+	ServiceClient service.{{.Service}}Client
 }
 
 func (client *Client) Connect() error {
@@ -25,7 +25,7 @@ func (client *Client) Connect() error {
 		return err
 	}
 	client.Connection = conn
-	client.GreeterClient = grpcService.NewGreeterClient(conn)
+	client.ServiceClient = service.New{{.Service}}Client(conn)
 	return nil
 }
 
@@ -42,7 +42,7 @@ func (client *Client) SayHello(name string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	r, err := client.GreeterClient.SayHello(ctx, &grpcService.HelloRequest{Name: name})
+	r, err := client.ServiceClient.SayHello(ctx, &service.HelloRequest{Name: name})
 	if err != nil {
 		return "", err
 	}
