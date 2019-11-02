@@ -9,7 +9,7 @@ import (
 )
 
 type Serverer interface {
-	Serve(server service.{{ .service.Service }}Server) error
+	Serve(server service.{{ .service.Resource }}Server) error
 	Server() *grpc.Server
 }
 
@@ -24,7 +24,7 @@ func (s *Server) Server() *grpc.Server {
 	return s.gs
 }
 
-func (s *Server) Serve(server service.{{ .service.Service }}Server) error {
+func (s *Server) Serve(server service.{{ .service.Resource }}Server) error {
 	defer glog.Flush()
 
 	lis, err := net.Listen("tcp", *api.GrpcAddr)
@@ -32,7 +32,7 @@ func (s *Server) Serve(server service.{{ .service.Service }}Server) error {
 		return err
 	}
 
-	service.Register{{ .service.Service }}Server(s.Server(), server)
+	service.Register{{ .service.Resource }}Server(s.Server(), server)
 
 	return s.Server().Serve(lis)
 }

@@ -15,7 +15,7 @@ type Clienter interface {
 
 type Client struct {
 	Connection    *grpc.ClientConn
-	ServiceClient service.{{ .service.Service  }}Client
+	ServiceClient service.{{ .service.Resource  }}Client
 }
 
 func (client *Client) Connect() error {
@@ -25,7 +25,7 @@ func (client *Client) Connect() error {
 		return err
 	}
 	client.Connection = conn
-	client.ServiceClient = service.New{{ .service.Service }}Client(conn)
+	client.ServiceClient = service.New{{ .service.Resource }}Client(conn)
 	return nil
 }
 

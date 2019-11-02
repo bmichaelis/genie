@@ -11,7 +11,7 @@ import "google/protobuf/wrappers.proto";
 
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 	info: {
-		title: "{{ .service.Service }} service"
+		title: "{{ .service.Resource }} service"
 		version: "1.0"
 		contact: {
 			name: "<< insert author name here >>"
@@ -40,11 +40,11 @@ option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.goproto_sizecache_all) = false;
 
 // The greeting service definition.
-service {{ .service.Service }} {
+service {{ .service.Resource }} {
     // Sends a greeting
     rpc SayHello (HelloRequest) returns (HelloReply) {
         option (google.api.http) = {
-            get: "/api/{{ .service.ServiceLower }}/hello"
+            get: "/api/{{ .service.HttpResource }}/hello"
         };
     }
 
@@ -61,7 +61,7 @@ service {{ .service.Service }} {
         };
 
         option (google.api.http) = {
-          post: "/api/{{ .service.ServiceLower }}"
+          post: "/api/{{ .service.HttpResource }}"
           body: "*"
         };
     }
@@ -75,7 +75,7 @@ service {{ .service.Service }} {
         };
 
         option (google.api.http) = {
-          get: "/api/{{ .service.ServiceLower }}/{id}"
+          get: "/api/{{ .service.HttpResource }}/{id}"
         };
     }
 
@@ -88,7 +88,7 @@ service {{ .service.Service }} {
         };
 
         option (google.api.http) = {
-          post: "/api/{{ .service.ServiceLower }}/search"
+          post: "/api/{{ .service.HttpResource }}/search"
           body: "*"
         };
     }
@@ -102,7 +102,7 @@ service {{ .service.Service }} {
         };
 
         option (google.api.http) = {
-          patch: "/api/{{ .service.ServiceLower }}/{id}"
+          patch: "/api/{{ .service.HttpResource }}/{id}"
           body: "*"
         };
     }
@@ -116,7 +116,7 @@ service {{ .service.Service }} {
         };
 
         option (google.api.http) = {
-          delete: "/api/{{ .service.ServiceLower }}/{id}"
+          delete: "/api/{{ .service.HttpResource }}/{id}"
         };
     }
 
@@ -129,7 +129,7 @@ service {{ .service.Service }} {
         };
 
         option (google.api.http) = {
-          put: "/api/{{ .service.ServiceLower }}/{id}"
+          put: "/api/{{ .service.HttpResource }}/{id}"
         };
     }
 }
@@ -156,7 +156,7 @@ message Id {
     string id = 1 [(validate.rules).string.pattern = "/^[a-f\\d]{24}$/i"];
 }
 
-message {{ .service.Service }} {
+message User {
     string id    = 1;
 
     // This is an example on how to provide an ObjectID without a custom docker generator

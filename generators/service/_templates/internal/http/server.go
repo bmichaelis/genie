@@ -25,7 +25,7 @@ func (*Server) Serve() error {
 
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	err := service.Register{{ .service.Service }}HandlerFromEndpoint(ctx, mux, *api.GrpcAddr, opts)
+	err := service.Register{{ .service.Resource }}HandlerFromEndpoint(ctx, mux, *api.GrpcAddr, opts)
 	if err != nil {
 		return err
 	}

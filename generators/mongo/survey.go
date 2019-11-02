@@ -1,19 +1,21 @@
 package mongo
 
 import (
+	"genie/generators"
+	"genie/generators/service"
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
+	"github.com/go-openapi/inflect"
 	"strings"
 )
 
 type Responses struct {
-	Enable          bool
-	CollectionName  string
-	CollectionTitle string
-	Database        string
-	Username        string
-	Password        string
-	Port            string
+	Enable         bool
+	CollectionName string
+	Database       string
+	Username       string
+	Password       string
+	Port           string
 }
 
 type Survey struct {
@@ -58,12 +60,9 @@ func (s *Survey) Start() *Responses {
 			panic(err)
 		}
 
-		if err := survey.AskOne(&survey.Input{
-			Message: "Collection name?",
-		}, &responses.CollectionName, survey.WithValidator(survey.Required)); err != nil {
-			panic(err)
-		}
-		responses.CollectionTitle = strings.Title(responses.CollectionName)
+		s := generators.GetInstance().Find(service.NAME).(*service.Generator)
+		pluralResource := inflect.Pluralize(s.Responses.Resource)
+		responses.CollectionName = strings.ToLower(inflect.Underscore(pluralResource))
 
 	}
 	return responses

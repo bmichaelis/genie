@@ -45,7 +45,8 @@ func (*Generator) printHeader() {
 
 func (g *Generator) setWorkingDir() {
 	responses := g.Responses
-	if err := os.Chdir(responses.ServicePath()); err != nil {
+	path := responses.ServicePath()
+	if err := os.Chdir(path); err != nil {
 		panic(err)
 	}
 }
@@ -85,7 +86,7 @@ func (g *Generator) writeFiles() {
 		defer f.Close()
 		w := bufio.NewWriter(f)
 		_ = t.Execute(w, map[string]interface{}{
-			"service": g.Responses,
+			g.GetName(): g.Responses,
 		})
 		return w.Flush()
 	})

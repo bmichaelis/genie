@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "{{{.Service.Package}}}.fullname" . }}
+  name: {{ template "{{{ .service.Package }}}.fullname" . }}
   labels:
 {{ include "labels" . | indent 4 }}
   annotations:
@@ -21,16 +21,16 @@ spec:
         language: golang
     spec:
       containers:
-      - name: {{ template "{{{.Service.Package}}}.name" . }}
+      - name: {{ template "{{{ .service.Package }}}.name" . }}
         image: {{ include "image" . }}
         env:
         {{- range $key, $value := .Values.env }}
         - name: {{ $key }}
           value: {{ $value | quote }}
         {{- end }}
-        - name: {{{.service.PackageUpper}}}_CONFIG_PROFILE
+        - name: {{{ .service.EnvVar }}}_CONFIG_PROFILE
           value: {{ .Release.Namespace | lower }}
-        - name: {{{.service.PackageUpper}}}_GO_CONFIGS
+        - name: {{{ .service.EnvVar }}}_GO_CONFIGS
           value: /config
         imagePullPolicy: IfNotPresent
         resources:

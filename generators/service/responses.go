@@ -6,23 +6,42 @@ import (
 	"os"
 	"reflect"
 	"regexp"
-	"strings"
 )
 
+// Repository: 			https://github.com/roboncode/awesome-sauce-api (input)
+// Resource (Model):	AwesomeSauce (input)
+// Package: 			awesomesauce_api (extracted from Repository and formatted)
+// EnvVar:				AWESOME_SAUCE (formatted from Resource)
+// HttpResource:		awesome-sauce (formatted from Resource)
+// MongoCollection:		awesome_sauce (formatted from Resource)
+
 type Responses struct {
-	Source       string
-	Namespace    string
-	Package      string
-	PackageUpper string
-	Service      string
-	ServiceLower string
-	DeleteDir    bool
-	GrpcPort     string
-	EnableHttp   bool
-	HttpPort     string
+	GoSourcePath    string
+	RepositoryPath  string // https://github.com/roboncode/awesomesauce-api (input)
+	Resource        string // AwesomeSauce (input)
+	Package         string // awesomesauce_api (extracted from Repository and formatted)
+	EnvVar          string // AWESOME_SAUCE (formatted from Resource)
+	HttpResource    string // awesome-sauce (formatted from Resource)
+	MongoCollection string // awesome_sauce (formatted from Resource)
+	DeleteDir       bool
+	GrpcPort        string
+	EnableHttp      bool
+	HttpPort        string
 }
 
-func (r *Responses) PackageName(val interface{}) error {
+func (r *Responses) ValidateResource(val interface{}) error {
+	value := reflect.ValueOf(val)
+	invalid, err := regexp.MatchString("[[A-Z]\\w+]+", value.String())
+	if err != nil {
+		return err
+	}
+	if invalid {
+		return errors.New("resource name must be start with uppercase letter and CamelCase")
+	}
+	return nil
+}
+
+func (r *Responses) ValidatePackageName(val interface{}) error {
 	value := reflect.ValueOf(val)
 	invalid, err := regexp.MatchString("[\\W0-9A-Z]+", value.String())
 	if err != nil {
@@ -35,13 +54,10 @@ func (r *Responses) PackageName(val interface{}) error {
 }
 
 func (r *Responses) ServicePath() string {
-	if r.Namespace == "" {
-		return strings.ToLower(fmt.Sprintf("%s/%s", r.Source, r.Package))
-	}
-	return strings.ToLower(fmt.Sprintf("%s/%s/%s", r.Source, r.Namespace, r.Package))
+	return fmt.Sprintf("%s/%s", r.GoSourcePath, r.RepositoryPath)
 }
 
-func getSourceDirectory() string {
+func getGoSourcePath() string {
 	// see if they are using go path and attempt to build the target dir from it
 	// otherwise use cwd
 	var targetPath string
@@ -67,6 +83,6 @@ func getSourceDirectory() string {
 
 func NewResponses() *Responses {
 	return &Responses{
-		Source: getSourceDirectory(),
+		GoSourcePath: getGoSourcePath(),
 	}
 }

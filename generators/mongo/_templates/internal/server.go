@@ -13,8 +13,8 @@ import (
 )
 
 type Server struct {
-	service.{{ .service.Service }}Server
-	{{ .mongo.CollectionTitle }}Collection *mongo.Collection
+	service.{{ .service.Resource }}Server
+	{{ .service.Resource }}Collection *mongo.Collection
 }
 
 func (s *Server) SayHello(ctx context.Context, req *service.HelloRequest) (*service.HelloReply, error) {
@@ -34,7 +34,7 @@ func (*Server) Get(ctx context.Context, req *service.Id) (*service.User, error) 
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
 
-func (*Server) Search(req *service.SearchRequest, srv service.Persons_SearchServer) error {
+func (*Server) Search(req *service.SearchRequest, srv service.{{ .service.Resource }}_SearchServer) error {
 	return status.Errorf(codes.Unimplemented, "method Search not implemented")
 }
 
@@ -60,10 +60,10 @@ func (s *Server) connectToMongo() {
 		panic(err)
 	}
 
-	s.UserCollection = client.Database("sample").Collection("users")
+	s.{{ .service.Resource  }}Collection = client.Database("{{ .mongo.Database }}").Collection("{{ .mongo.CollectionName }}")
 }
 
-func NewServer() service.{{ .service.Service }}Server {
+func NewServer() service.{{ .service.Resource }}Server {
 	server := Server{}
 	server.connectToMongo()
 	return &server

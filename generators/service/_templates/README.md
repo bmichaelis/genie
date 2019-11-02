@@ -9,7 +9,7 @@ go mod download
 go run cmd/{{ .service.Package }}/main.go
 ```
 
-### Running as docker comtainer
+### Running as docker container
 
 ```shell script
 docker build -t {{ .service.Package }} .
