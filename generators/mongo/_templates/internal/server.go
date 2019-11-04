@@ -30,12 +30,15 @@ type {{ .service.Resource }} struct {
 	UpdatedAt *time.Time         `bson:"updated_at,omitempty"`
 }
 
-func (s *Server) Create(ctx context.Context, item *{{ .service.Package }}.{{ .service.Resource }}) (*{{ .service.Package }}.Id, error) {
+func (s *Server) Create(ctx context.Context, req *{{ .service.Package }}.{{ .service.Resource }}) (*{{ .service.Package }}.Id, error) {
+	if err := req.Validate(); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
 	var now = time.Now()
 	var doc = {{ .service.Resource }}{
-		Enabled:   item.GetEnabled(),
-		Type:      item.GetType(),
-		Name:      item.GetName(),
+		Enabled:   req.GetEnabled(),
+		Type:      req.GetType(),
+		Name:      req.GetName(),
 		CreatedAt: &now,
 	}
 	result, err := s.{{ .service.Resource }}Collection.InsertOne(context.Background(), doc)
@@ -48,6 +51,9 @@ func (s *Server) Create(ctx context.Context, item *{{ .service.Package }}.{{ .se
 }
 
 func (s *Server) Get(ctx context.Context, req *{{ .service.Package }}.Id) (*{{ .service.Package }}.{{ .service.Resource }}, error) {
+	if err := req.Validate(); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
 	oid, err := primitive.ObjectIDFromHex(req.GetId())
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("Could not convert to ObjectId: %v", err))
@@ -84,11 +90,14 @@ func (s *Server) Get(ctx context.Context, req *{{ .service.Package }}.Id) (*{{ .
 	return response, nil
 }
 
-func (s *Server) List(ctx context.Context, criteria *{{ .service.Package }}.Criteria) (*{{ .service.Package }}.{{ .service.Resources }}, error) {
+func (s *Server) List(ctx context.Context, req *{{ .service.Package }}.Criteria) (*{{ .service.Package }}.{{ .service.Resources }}, error) {
+	if err := req.Validate(); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
 	// collection.Find returns a cursor for our (empty) query
 	cursor, err := s.{{ .service.Resource }}Collection.Find(context.Background(), bson.M{
-		"enabled": criteria.Enabled,
-		"type":    criteria.Type,
+		"enabled": req.Enabled,
+		"type":    req.Type,
 	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Unknown internal error: %v", err))
@@ -131,9 +140,12 @@ func (s *Server) List(ctx context.Context, criteria *{{ .service.Package }}.Crit
 	return &{{ .service.Package }}.{{ .service.Resources }}{Items: items}, nil
 }
 
-func (s *Server) Update(ctx context.Context, item *{{ .service.Package }}.{{ .service.Resource }}) (*{{ .service.Package }}.{{ .service.Resource }}, error) {
+func (s *Server) Update(ctx context.Context, req *{{ .service.Package }}.{{ .service.Resource }}) (*{{ .service.Package }}.{{ .service.Resource }}, error) {
+	if err := req.Validate(); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
 	// Convert the Id string to a MongoDB ObjectId
-	oid, err := primitive.ObjectIDFromHex(item.GetId())
+	oid, err := primitive.ObjectIDFromHex(req.GetId())
 	if err != nil {
 		return nil, status.Errorf(
 			codes.InvalidArgument,
@@ -143,9 +155,9 @@ func (s *Server) Update(ctx context.Context, item *{{ .service.Package }}.{{ .se
 
 	// Convert the data to be updated into an unordered Bson document
 	update := bson.M{
-		"enabled":    item.GetEnabled(),
-		"type":       item.GetType(),
-		"name":       item.GetName(),
+		"enabled":    req.GetEnabled(),
+		"type":       req.GetType(),
+		"name":       req.GetName(),
 		"updated_at": time.Now(),
 	}
 
@@ -188,6 +200,9 @@ func (s *Server) Update(ctx context.Context, item *{{ .service.Package }}.{{ .se
 }
 
 func (s *Server) Delete(ctx context.Context, req *{{ .service.Package }}.Id) (*empty.Empty, error) {
+	if err := req.Validate(); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
 	oid, err := primitive.ObjectIDFromHex(req.GetId())
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("Could not convert to ObjectId: %v", err))

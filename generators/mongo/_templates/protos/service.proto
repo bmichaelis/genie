@@ -137,7 +137,7 @@ message {{ .service.Resource }} {
 
 message Id {
     // Check for valid ObjectId
-    string id = 1 [(validate.rules).string.pattern = "/^[a-f\\d]{24}$/i"];
+    string id = 1 [(validate.rules).string.pattern = "^[a-f\\d]{24}$"];
 }
 
 message Criteria {
