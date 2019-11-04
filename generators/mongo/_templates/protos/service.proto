@@ -1,0 +1,141 @@
+syntax = "proto3";
+package {{ .service.Package }};
+
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+	info: {
+		title: "{{ .service.Resource }} service"
+		version: "1.0"
+		contact: {
+        name: "<< insert author name here >>"
+        url: "<< insert url here >>"
+        email: "<< insert email here >>"
+      }
+    }
+    schemes: HTTP
+    consumes: "application/json"
+    produces: "application/json"
+    responses: {
+		key: "404"
+		value: {
+			description: "Returned when the resource does not exist."
+			schema: {
+				json_schema: {
+					type: STRING
+				}
+			}
+		}
+	}
+};
+
+option (gogoproto.goproto_unkeyed_all) = false;
+option (gogoproto.goproto_unrecognized_all) = false;
+option (gogoproto.goproto_sizecache_all) = false;
+
+// The greeting service definition.
+service App {
+    rpc Create ({{ .service.Resource }}) returns (Id) {
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+          summary: "<< insert summary here >>"
+          description: "<< insert description here >>"
+          consumes: "application/json"
+          produces: "application/json"
+        };
+
+        option (google.api.http) = {
+          post: "/api/{{ .service.HttpResource }}"
+          body: "*"
+        };
+    }
+
+    rpc Get (Id) returns ({{ .service.Resource }}) {
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+          summary: "<< insert summary here >>"
+          description: "<< insert description here >>"
+          consumes: "application/json"
+          produces: "application/json"
+        };
+
+        option (google.api.http) = {
+          get: "/api/{{ .service.HttpResource }}/{id}"
+        };
+    }
+
+    rpc List (Criteria) returns ({{ .service.Resources }}) {
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+          summary: "<< insert summary here >>"
+          description: "<< insert description here >>"
+          consumes: "application/json"
+          produces: "application/json"
+        };
+
+        option (google.api.http) = {
+          get: "/api/{{ .service.HttpResource }}"
+        };
+    }
+
+    rpc Update ({{ .service.Resource }}) returns ({{ .service.Resource }}) {
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+          summary: "<< insert summary here >>"
+          description: "<< insert description here >>"
+          consumes: "application/json"
+          produces: "application/json"
+        };
+
+        option (google.api.http) = {
+          patch: "/api/{{ .service.HttpResource }}/{id}"
+          body: "*"
+        };
+    }
+
+    rpc Delete (Id) returns (google.protobuf.Empty) {
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+          summary: "<< insert summary here >>"
+          description: "<< insert description here >>"
+          consumes: "application/json"
+          produces: "application/json"
+        };
+
+        option (google.api.http) = {
+          delete: "/api/{{ .service.HttpResource }}/{id}"
+        };
+    }
+}
+
+message {{ .service.Resource }} {
+    string id = 1;
+    bool enabled = 2;
+    int32 type = 3;
+    string name = 4;
+    google.protobuf.Timestamp createdAt = 5;
+    google.protobuf.Timestamp updatedAt = 6;
+
+    enum Type {
+        PENDING = 0;
+        ACTIVE = 1;
+        EXPIRED = 2;
+    }
+}
+
+message Id {
+    // Check for valid ObjectId
+    string id = 1 [(validate.rules).string.pattern = "/^[a-f\\d]{24}$/i"];
+}
+
+message Criteria {
+    bool enabled = 1;
+    int32 type = 2;
+    int32 skip = 3;
+    int32 limit = 4;
+}
+
+message {{ .service.Resources }} {
+    repeated {{ .service.Resource }} items = 1;
+}

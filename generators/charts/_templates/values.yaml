@@ -16,16 +16,16 @@ resources:
 
 deploymentDestination: ""
 
-{{{.Service.Package}}}:
+{{{ .service.Package }}}:
     image:
-      registry: {{{.Chart.ArtifactoryUrl}}}
-      repository: {{{.Service.Package}}}
+      registry: {{{ .chart.ArtifactoryUrl }}}
+      repository: {{{ .service.Package }}}
 ingress:
   enabled: true
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-fullnameOverride: "{{{.Service.Package}}}"
+fullnameOverride: "{{{ .service.Package }}}"
 nameOverride: ""
 
 minReplicas: 1

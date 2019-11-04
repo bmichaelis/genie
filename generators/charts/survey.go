@@ -1,6 +1,8 @@
 package charts
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
 )
@@ -52,6 +54,10 @@ func (s *Survey) Start() *Responses {
 			panic(err)
 		}
 	}
+
+	var b, _ = json.MarshalIndent(responses, "", "   ")
+	fmt.Println("\ncharts", string(b))
+
 	return responses
 }
 

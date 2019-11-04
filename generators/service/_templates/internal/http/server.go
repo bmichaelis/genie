@@ -6,8 +6,8 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
 	"net/http"
-	"{{.Package}}/api"
-	service "{{.Package}}/generated"
+	"{{ .service.Package }}/api"
+	{{ .service.Package }} "{{ .service.Package }}/generated"
 )
 
 type Serverer interface {
@@ -25,7 +25,7 @@ func (*Server) Serve() error {
 
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	err := service.Register{{.Service}}HandlerFromEndpoint(ctx, mux, *api.GrpcAddr, opts)
+	err := {{ .service.Package }}.RegisterAppHandlerFromEndpoint(ctx, mux, *api.GrpcAddr, opts)
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,6 @@
 
-{{- define "{{{.Service.Package}}}.rules" -}}
-{{- $serviceName := include "{{{.Service.Package}}}.name" .default -}}
+{{- define "{{{ .service.Package }}}.rules" -}}
+{{- $serviceName := include "{{{ .service.Package }}}.name" .default -}}
   {{- range .hosts }}
     - host: {{ . }}
       http:
@@ -8,14 +8,14 @@
           - backend:
               serviceName: {{ $serviceName }}
               servicePort: http
-            path: /api/{{{.Service.Package}}}
+            path: /api/{{{ .service.Package.Name }}}
   {{- end }}
 {{- end -}}
 {{- if .Values.ingress.enabled -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ include "{{{.Service.Package}}}.fullname" . }}
+  name: {{ include "{{{ .service.Package }}}.fullname" . }}
   labels:
 {{ include "labels" . | indent 4 }}
   {{- with .Values.ingress.annotations }}
@@ -25,12 +25,12 @@ metadata:
 spec:
   rules:
 {{- if eq .Values.deploymentDestination "production" -}}
-  {{- $hosts := tuple "{{{.Chart.Domain}}}" "www.{{{.Chart.Domain}}}" -}}
-  {{- include "{{{.Service.Package}}}.rules" (dict "hosts" $hosts "default" .) -}}
+  {{- $hosts := tuple "{{{ .chart.Domain }}}" "www.{{{ .chart.Domain }}}" -}}
+  {{- include "{{{ .service.Package }}}.rules" (dict "hosts" $hosts "default" .) -}}
 {{- else -}}
-  {{- $host := printf "%s.{{{.Chart.Domain}}}" .Release.Namespace }}
+  {{- $host := printf "%s.{{{ .chart.Domain }}}" .Release.Namespace }}
   {{- $hosts := tuple $host -}}
-  {{- include "{{{.Service.Package}}}.rules" (dict "hosts" $hosts "default" .) -}}
+  {{- include "{{{ .service.Package }}}.rules" (dict "hosts" $hosts "default" .) -}}
 {{- end }}
 
 {{- end }}

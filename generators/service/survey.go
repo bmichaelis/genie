@@ -1,9 +1,12 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
+	"github.com/go-openapi/inflect"
+	"regexp"
 	"strings"
 )
 
@@ -13,28 +16,38 @@ type Survey struct {
 
 func (s *Survey) Start() *Responses {
 	color.Yellow("\nService\n------------------------------------------------------\n")
+	var resp = s.Responses
 
+	// Question 1
+	var repositoryUrl string
 	if err := survey.AskOne(&survey.Input{
-		Message: "Namespace? (ex. github.com/myrepo). Leave empty to skip.",
-	}, &s.Responses.Namespace); err != nil {
+		Message: "Repository Url? (ex. https://github.com/roboncode/awesome-sauce-api)",
+	}, &repositoryUrl); err != nil {
 		panic(err)
 	}
 
-	if err := survey.AskOne(&survey.Input{
-		Message: "Package name?",
-	}, &s.Responses.Package, survey.WithValidator(survey.Required), survey.WithValidator(s.Responses.PackageName)); err != nil {
-		panic(err)
-	}
-	s.Responses.Package = strings.ToLower(s.Responses.Package)
-	s.Responses.PackageUpper = strings.ToUpper(s.Responses.Package)
+	r1, _ := regexp.Compile("^(https?://)?")
+	resp.RepositoryPath = r1.ReplaceAllString(repositoryUrl, "")
 
+	r2, _ := regexp.Compile("([\\w-]+)$")
+	foundStrings := r2.FindAllString(resp.RepositoryPath, 1)
+	if len(foundStrings) > 0 {
+		resp.Package = inflect.Underscore(foundStrings[0])
+	}
+
+	// Question 2
+	var resource string
 	if err := survey.AskOne(&survey.Input{
-		Message: "Service name? (ex. Users)",
-	}, &s.Responses.Service, survey.WithValidator(survey.Required)); err != nil {
+		Message: "Resource (ex. AwesomeSauce)? ",
+	}, &resource, survey.WithValidator(survey.Required), nil); err != nil {
 		panic(err)
 	}
-	s.Responses.Service = strings.Title(s.Responses.Service)
-	s.Responses.ServiceLower = strings.ToLower(s.Responses.Service)
+	singleResource := inflect.Singularize(resource)
+	pluralResource := inflect.Pluralize(resource)
+	resp.Resource = inflect.Capitalize(singleResource)
+	resp.Resources = inflect.Capitalize(pluralResource)
+	resp.EnvVar = strings.ToUpper(inflect.Underscore(singleResource))
+	resp.HttpResource = inflect.Dasherize(pluralResource)
 
 	if err := survey.AskOne(&survey.Confirm{
 		Message: fmt.Sprintf("Delete directory if exists (%s)", s.Responses.ServicePath()),
@@ -65,6 +78,10 @@ func (s *Survey) Start() *Responses {
 			panic(err)
 		}
 	}
+
+	var b, _ = json.MarshalIndent(s.Responses, "", "   ")
+	fmt.Println("\nservice", string(b))
+
 	return s.Responses
 }
 

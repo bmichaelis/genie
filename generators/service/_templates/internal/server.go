@@ -2,23 +2,23 @@ package internal
 
 import (
 	"context"
-	service "{{.Package}}/generated"
+	{{ .service.Package }} "{{ .service.Package }}/generated"
 	"log"
 )
 
 type Server struct {
-	service.{{.Service}}Server
+	{{ .service.Package }}.AppServer
 }
 
-func (s *Server) SayHello(ctx context.Context, req *service.HelloRequest) (*service.HelloReply, error) {
+func (s *Server) SayHello(ctx context.Context, req *{{ .service.Package }}.HelloRequest) (*{{ .service.Package }}.HelloReply, error) {
 	log.Printf("Received: %v", req.GetName())
 	name := req.GetName()
 	if name == "" {
-		name = service.HelloRequest_world.String()
+		name = {{ .service.Package }}.HelloRequest_world.String()
 	}
-	return &service.HelloReply{Message: "Hello, " + name}, nil
+	return &{{ .service.Package }}.HelloReply{Message: "Hello, " + name + "!"}, nil
 }
 
-func NewServer() service.{{ .Service }}Server {
+func NewServer() {{ .service.Package }}.AppServer {
 	return &Server{}
 }

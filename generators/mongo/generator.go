@@ -1,9 +1,10 @@
-package charts
+package mongo
 
 import (
 	"bufio"
 	"fmt"
 	"genie/generators"
+	"genie/generators/charts"
 	"genie/generators/service"
 	"github.com/gobuffalo/packr/v2"
 	"os"
@@ -12,9 +13,7 @@ import (
 )
 
 const (
-	NAME  = "charts"
-	LEFT  = "{{{"
-	RIGHT = "}}}"
+	NAME = "mongo"
 )
 
 type Generator struct {
@@ -36,9 +35,10 @@ func (g *Generator) Finalize() {}
 
 func (g *Generator) writeFiles() {
 	s := generators.GetInstance().Find(service.NAME).(*service.Generator)
+	c := generators.GetInstance().Find(charts.NAME).(*charts.Generator)
 	box := packr.New(NAME, "./_templates")
 	err := box.Walk(func(path string, file packr.File) error {
-		fullOutputPath := fmt.Sprintf("%s/charts/%s/%s", s.Responses.ServicePath(), s.Responses.Package, path)
+		fullOutputPath := fmt.Sprintf("%s/%s", s.Responses.ServicePath(), path)
 		// create directory path
 		dir := filepath.Dir(fullOutputPath)
 		if _, err := os.Stat(fullOutputPath); os.IsNotExist(err) {
@@ -47,7 +47,7 @@ func (g *Generator) writeFiles() {
 
 		content := file.String()
 
-		t, err := template.New(path).Delims(LEFT, RIGHT).Parse(content)
+		t, err := template.New(path).Parse(content)
 		if err != nil {
 			return err
 		}
@@ -59,6 +59,7 @@ func (g *Generator) writeFiles() {
 		w := bufio.NewWriter(f)
 		_ = t.Execute(w, map[string]interface{}{
 			s.GetName(): s.Responses,
+			c.GetName(): c.Responses,
 			g.GetName(): g.Responses,
 		})
 		return w.Flush()

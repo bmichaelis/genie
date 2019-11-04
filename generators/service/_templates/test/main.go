@@ -1,22 +1,24 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"github.com/golang/glog"
-	"{{.Package}}/api"
-	service "{{.Package}}/generated"
+	"{{ .service.Package }}/api"
+	{{ .service.Package }} "{{ .service.Package }}/generated"
 )
 
 func main() {
-	client := api.NewClient()
-	if err := client.Connect(); err != nil {
-		glog.Fatalf("Error connecting: %s", err.Error())
-	}
-
-	msg, err := client.SayHello(service.HelloRequest_world.String())
+	client, err := api.Connect()
 	if err != nil {
-		glog.Fatalf("Error calling SayHello: %s", err.Error())
+		panic(err)
 	}
 
-	fmt.Println("Greeting: ", msg)
+	result, err := client.SayHello(context.Background(), &{{ .service.Package }}.HelloRequest{
+		Name: {{ .service.Package }}.HelloRequest_world.String(),
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Greeting: ", result.Message)
 }

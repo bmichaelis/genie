@@ -3,5 +3,5 @@ services:
   app:
     build: ""
     ports:
-      - "{{.GrpcPort}}:{{.GrpcPort}}"
-{{if .EnableHttp}}      - "{{.HttpPort}}:{{.HttpPort}}"{{end}}
+      - "{{ .service.GrpcPort }}:{{ .service.GrpcPort }}"
+{{if .service.EnableHttp }}      - "{{ .service.HttpPort }}:{{ .service.HttpPort }}"{{end}}
