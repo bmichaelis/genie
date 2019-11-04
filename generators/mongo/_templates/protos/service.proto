@@ -2,13 +2,13 @@ syntax = "proto3";
 package {{ .service.Package }};
 
 import "google/api/annotations.proto";
-import "protoc-gen-swagger/options/annotations.proto";
+{{ if .service.EnableHttp }}import "protoc-gen-swagger/options/annotations.proto";{{end}}
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "google/protobuf/empty.proto";
-import "google/protobuf/wrappers.proto";
 import "google/protobuf/timestamp.proto";
 
+{{ if .service.EnableHttp }}
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 	info: {
 		title: "{{ .service.Resource }} service"
@@ -34,6 +34,7 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 		}
 	}
 };
+{{end}}
 
 option (gogoproto.goproto_unkeyed_all) = false;
 option (gogoproto.goproto_unrecognized_all) = false;
@@ -42,6 +43,7 @@ option (gogoproto.goproto_sizecache_all) = false;
 // The greeting service definition.
 service App {
     rpc Create ({{ .service.Resource }}) returns (Id) {
+{{ if .service.EnableHttp }}
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
           summary: "<< insert summary here >>"
           description: "<< insert description here >>"
@@ -53,9 +55,11 @@ service App {
           post: "/api/{{ .service.HttpResource }}"
           body: "*"
         };
+{{end}}
     }
 
     rpc Get (Id) returns ({{ .service.Resource }}) {
+{{ if .service.EnableHttp }}
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
           summary: "<< insert summary here >>"
           description: "<< insert description here >>"
@@ -66,9 +70,11 @@ service App {
         option (google.api.http) = {
           get: "/api/{{ .service.HttpResource }}/{id}"
         };
+{{end}}
     }
 
     rpc List (Criteria) returns ({{ .service.Resources }}) {
+{{ if .service.EnableHttp }}
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
           summary: "<< insert summary here >>"
           description: "<< insert description here >>"
@@ -79,9 +85,11 @@ service App {
         option (google.api.http) = {
           get: "/api/{{ .service.HttpResource }}"
         };
+{{end}}
     }
 
     rpc Update ({{ .service.Resource }}) returns ({{ .service.Resource }}) {
+{{ if .service.EnableHttp }}
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
           summary: "<< insert summary here >>"
           description: "<< insert description here >>"
@@ -93,9 +101,11 @@ service App {
           patch: "/api/{{ .service.HttpResource }}/{id}"
           body: "*"
         };
+{{end}}
     }
 
     rpc Delete (Id) returns (google.protobuf.Empty) {
+{{ if .service.EnableHttp }}
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
           summary: "<< insert summary here >>"
           description: "<< insert description here >>"
@@ -106,6 +116,7 @@ service App {
         option (google.api.http) = {
           delete: "/api/{{ .service.HttpResource }}/{id}"
         };
+{{end}}
     }
 }
 
