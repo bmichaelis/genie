@@ -6,22 +6,24 @@ Genie is an extensible service generator used to create gRPC micro-services for 
 
 ## Features
 
-Genie allows you to:
+Genie provides the following:
 
-* Choose your namespace
-* Choose the name of your package
-* Choose to enable HTTP annotations for endpoint support
-* Choose gRPC and HTTP ports
-* Easily add new generators
+* Simple setup for
+    * gRPC service
+    * Helm charts for Kubernetes deployment
+    * Mongo database CRUD service
+* Easily add new generators for your own custom needs
+* File overrides
+* Uses Go Templates
 
 The generated project contains the following:
 
-* Proto file for gRPC / HTTP service generation
+* Proto file for gRPC with optional HTTP service generation
 * Generator using Docker (no locally installed proto compiler required)
 * Common project layout for Go
 * gRPC client for service-to-service communication
 * Swagger file for HTTP endpoints
-* Ready to in local docker environment using docker compose
+* Ready-to-use local docker environment using docker-compose
 * (Optional) Helm charts for Kubernetes
 * (Optional) Example CRUD using Mongo database
 
