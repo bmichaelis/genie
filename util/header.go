@@ -16,10 +16,6 @@ func (h *Header) String() string {
 func (h *Header) Print() {
 	logoColor := color.New(color.FgMagenta)
 	_, _ = logoColor.Println(h.Logo)
-
-	// tagColor := color.New(color.FgWhite)
-	// _, _ = tagColor.Println(h.Tag)
-
 }
 
 func NewHeader() *Header {
@@ -33,6 +29,5 @@ func NewHeader() *Header {
      ,  88P                             
     "8",P"     Go Service Generator                           
 `
-	// header.Tag = "        *** gRPC Service Generator for Go ***"
 	return &header
 }
