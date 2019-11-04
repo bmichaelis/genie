@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"genie/generators"
 	"genie/generators/service"
+	"regexp"
+	"strings"
+
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
 	"github.com/go-openapi/inflect"
-	"strings"
 )
 
 type Responses struct {
@@ -18,6 +20,7 @@ type Responses struct {
 	Username   string
 	Password   string
 	Address    string
+	Port       string
 }
 
 type Survey struct {
@@ -63,10 +66,12 @@ func (s *Survey) Start() *Responses {
 			panic(err)
 		}
 
+		r, _ := regexp.Compile("\\d+")
+		responses.Port = r.FindString(responses.Address)
+
 		s := generators.GetInstance().Find(service.NAME).(*service.Generator)
 		pluralResource := inflect.Pluralize(s.Responses.Resource)
 		responses.Collection = strings.ToLower(inflect.Underscore(pluralResource))
-
 	}
 
 	var b, _ = json.MarshalIndent(responses, "", "   ")

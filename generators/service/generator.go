@@ -34,6 +34,8 @@ func (g *Generator) Run() {
 func (g *Generator) Finalize() {
 	g.setWorkingDir()
 	g.changeFileMode()
+	// g.execGoModule111()
+	// g.execGoModVendor()
 	g.execGoGenerate()
 	g.execGoFmt()
 	g.printInstructions()
@@ -103,6 +105,24 @@ func (*Generator) changeFileMode() {
 	}
 }
 
+func (*Generator) execGoModule111() {
+	s := terminal.ShowBusy("export GOMODULE111=on...")
+	cmd := exec.Command("export", "GOMODULE111=on")
+	if err := cmd.Run(); err != nil {
+		panic(err)
+	}
+	s.Stop()
+}
+
+func (*Generator) execGoModVendor() {
+	s := terminal.ShowBusy("go mod vendor...")
+	cmd := exec.Command("go", "mod", "vendor")
+	if err := cmd.Run(); err != nil {
+		panic(err)
+	}
+	s.Stop()
+}
+
 func (*Generator) execGoGenerate() {
 	s := terminal.ShowBusy("go generate...")
 	cmd := exec.Command("go", "generate")
@@ -126,7 +146,10 @@ func (g *Generator) printInstructions() {
 	fmt.Println("\nService generation complete")
 	fmt.Println("------------------------------------------------")
 	fmt.Println("In terminal #1, to run the server...")
-	fmt.Printf("cd %s; go run cmd/main.go\n\n", responses.ServicePath())
+	fmt.Printf("cd %s\n", responses.ServicePath())
+	fmt.Printf("export GOMODULE111=on\n")
+	fmt.Printf("go mod vendor\n")
+	fmt.Printf("go run cmd/main.go\n\n")
 	fmt.Println("In terminal #2, to run the client...")
 	fmt.Printf("go run test/main.go\n\n")
 }
