@@ -4,12 +4,12 @@ package {{ .service.Package }};
 import "google/api/annotations.proto";
 
 // The greeting service definition.
-service {{ .service.Resource }} {
+service App {
     // Sends a greeting
     rpc SayHello (HelloRequest) returns (HelloReply) {
         {{ if .service.EnableHttp }}
         option (google.api.http) = {
-            get: "/api/{{ .service.Package }}/hello"
+            get: "/api/{{ .service.HttpResource }}/hello"
         };
         {{ end }}
     }

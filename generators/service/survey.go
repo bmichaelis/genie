@@ -38,16 +38,16 @@ func (s *Survey) Start() *Responses {
 	// Question 2
 	var resource string
 	if err := survey.AskOne(&survey.Input{
-		Message: "Resource in CamelCase (ex. AwesomeSauce)? ",
+		Message: "Resource (ex. AwesomeSauce)? ",
 	}, &resource, survey.WithValidator(survey.Required), nil); err != nil {
 		panic(err)
 	}
 	singleResource := inflect.Singularize(resource)
 	pluralResource := inflect.Pluralize(resource)
 	resp.Resource = inflect.Capitalize(singleResource)
+	resp.Resources = inflect.Capitalize(pluralResource)
 	resp.EnvVar = strings.ToUpper(inflect.Underscore(singleResource))
 	resp.HttpResource = inflect.Dasherize(pluralResource)
-	resp.MongoCollection = strings.ToLower(inflect.Underscore(pluralResource))
 
 	if err := survey.AskOne(&survey.Confirm{
 		Message: fmt.Sprintf("Delete directory if exists (%s)", s.Responses.ServicePath()),
@@ -79,8 +79,8 @@ func (s *Survey) Start() *Responses {
 		}
 	}
 
-	var b, _ = json.Marshal(s.Responses)
-	fmt.Println(string(b))
+	var b, _ = json.MarshalIndent(s.Responses, "", "   ")
+	fmt.Println("\nservice", string(b))
 
 	return s.Responses
 }

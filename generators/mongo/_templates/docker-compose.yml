@@ -6,7 +6,6 @@ services:
       - "{{ .service.GrpcPort }}:{{ .service.GrpcPort }}"
 {{if .service.EnableHttp }}      - "{{ .service.HttpPort }}:{{ .service.HttpPort }}"{{end}}
   mongo:
-    container_name: {{ .mongo.CollectionName }}-mongo
     environment:
 {{- if .mongo.Database }}       MONGO_INITDB_DATABASE: {{ .mongo.Database }}{{end}}
 {{- if .mongo.Username }}       MONGO_INITDB_ROOT_USERNAME: {{ .mongo.Username }}{{end}}

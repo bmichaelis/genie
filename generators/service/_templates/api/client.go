@@ -1,54 +1,27 @@
 package api
 
 import (
-	"context"
+	{{ .service.Package }} "{{ .service.Package }}/generated"
 	"google.golang.org/grpc"
-	"time"
-	service "{{ .service.Package }}/generated"
 )
 
-type Clienter interface {
-	Connect() error
-	Disconnect() error
-	SayHello(name string) (string, error)
-}
+var conn *grpc.ClientConn
 
-type Client struct {
-	Connection    *grpc.ClientConn
-	ServiceClient service.{{ .service.Resource  }}Client
-}
-
-func (client *Client) Connect() error {
-	// Set up a connection to the server.
-	conn, err := grpc.Dial(*GrpcAddr, grpc.WithInsecure())
+func Connect() ({{ .service.Package }}.AppClient, error) {
+	var err error
+	conn, err = grpc.Dial(*GrpcAddr, grpc.WithInsecure())
 	if err != nil {
-		return err
+		return nil, err
 	}
-	client.Connection = conn
-	client.ServiceClient = service.New{{ .service.Resource }}Client(conn)
-	return nil
+	client := {{ .service.Package }}.NewAppClient(conn)
+	return client, nil
 }
 
-func (client *Client) Disconnect() error {
-	if client.Connection != nil {
-		if err := client.Connection.Close(); err != nil {
+func Disconnect() error {
+	if conn != nil {
+		if err := conn.Close(); err != nil {
 			return err
 		}
 	}
 	return nil
-}
-
-func (client *Client) SayHello(name string) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	r, err := client.ServiceClient.SayHello(ctx, &service.HelloRequest{Name: name})
-	if err != nil {
-		return "", err
-	}
-	return r.GetMessage(), nil
-}
-
-func NewClient() Clienter {
-	return &Client{}
 }

@@ -7,16 +7,16 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
-
+import "google/protobuf/timestamp.proto";
 
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 	info: {
 		title: "{{ .service.Resource }} service"
 		version: "1.0"
 		contact: {
-			name: "<< insert author name here >>"
-			url: "<< insert url here >>"
-			email: "<< insert email here >>"
+        name: "<< insert author name here >>"
+        url: "<< insert url here >>"
+        email: "<< insert email here >>"
       }
     }
     schemes: HTTP
@@ -40,19 +40,8 @@ option (gogoproto.goproto_unrecognized_all) = false;
 option (gogoproto.goproto_sizecache_all) = false;
 
 // The greeting service definition.
-service {{ .service.Resource }} {
-    // Sends a greeting
-    rpc SayHello (HelloRequest) returns (HelloReply) {
-        option (google.api.http) = {
-            get: "/api/{{ .service.HttpResource }}/hello"
-        };
-    }
-
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_tag) = {
-      description: "<< insert description here >>"
-    };
-
-    rpc Create (User) returns (google.protobuf.StringValue) {
+service App {
+    rpc Create ({{ .service.Resource }}) returns (Id) {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
           summary: "<< insert summary here >>"
           description: "<< insert description here >>"
@@ -66,7 +55,7 @@ service {{ .service.Resource }} {
         };
     }
 
-    rpc Get (Id) returns (User) {
+    rpc Get (Id) returns ({{ .service.Resource }}) {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
           summary: "<< insert summary here >>"
           description: "<< insert description here >>"
@@ -79,7 +68,7 @@ service {{ .service.Resource }} {
         };
     }
 
-    rpc Search (SearchRequest) returns (stream User) {
+    rpc List (Criteria) returns ({{ .service.Resources }}) {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
           summary: "<< insert summary here >>"
           description: "<< insert description here >>"
@@ -88,12 +77,11 @@ service {{ .service.Resource }} {
         };
 
         option (google.api.http) = {
-          post: "/api/{{ .service.HttpResource }}/search"
-          body: "*"
+          get: "/api/{{ .service.HttpResource }}"
         };
     }
 
-    rpc Update (User) returns (google.protobuf.Empty) {
+    rpc Update ({{ .service.Resource }}) returns ({{ .service.Resource }}) {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
           summary: "<< insert summary here >>"
           description: "<< insert description here >>"
@@ -119,77 +107,35 @@ service {{ .service.Resource }} {
           delete: "/api/{{ .service.HttpResource }}/{id}"
         };
     }
+}
 
-    rpc Restore (Id) returns (google.protobuf.Empty) {
-        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-          summary: "<< insert summary here >>"
-          description: "<< insert description here >>"
-          consumes: "application/json"
-          produces: "application/json"
-        };
+message {{ .service.Resource }} {
+    string id = 1;
+    bool enabled = 2;
+    int32 type = 3;
+    string name = 4;
+    google.protobuf.Timestamp createdAt = 5;
+    google.protobuf.Timestamp updatedAt = 6;
 
-        option (google.api.http) = {
-          put: "/api/{{ .service.HttpResource }}/{id}"
-        };
+    enum Type {
+        PENDING = 0;
+        ACTIVE = 1;
+        EXPIRED = 2;
     }
 }
-
-// The request message containing the user's name.
-message HelloRequest {
-    string name = 1;
-
-    enum Names {
-        world = 0;
-        you = 1;
-        again = 2;
-    }
-}
-
-// The response message containing the greetings
-message HelloReply {
-    string message = 1;
-}
-
 
 message Id {
-    // Check for valid Mongo ObjectId
+    // Check for valid ObjectId
     string id = 1 [(validate.rules).string.pattern = "/^[a-f\\d]{24}$/i"];
 }
 
-message User {
-    string id    = 1;
-
-    // This is an example on how to provide an ObjectID without a custom docker generator
-    bytes id2 = 2 [(gogoproto.customtype) = "go.mongodb.org/mongo-driver/bson/primitive.ObjectID",
-                  (gogoproto.moretags) = "bson:\"_id\",omitempty",
-                  (gogoproto.jsontag) = "-"];
-
-    string email = 3 [(validate.rules).string.email = true,
-                     (gogoproto.moretags) = "bson:\"email\",omitempty"];
-
-    string name  = 4 [(validate.rules).string = {
-                      pattern:   "^[^[0-9]A-Za-z]+( [^[0-9]A-Za-z]+)*$",
-                      max_bytes: 256,
-},
-(gogoproto.moretags) = "bson:\"name\",omitempty"];
-
-Address address = 5;
-
-message Address {
-    string street     = 1 [(gogoproto.moretags) = "bson:\"street\",omitempty"];
-    string city       = 2 [(gogoproto.moretags) = "bson:\"city\",omitempty"];
-    string state      = 3 [(gogoproto.moretags) = "bson:\"state\",omitempty"];
-    string postalCode = 4 [(gogoproto.jsontag) = "postal_code,omitempty",
-                          (gogoproto.moretags) = "bson:\"postal_code\",omitempty"];
-}
+message Criteria {
+    bool enabled = 1;
+    int32 type = 2;
+    int32 skip = 3;
+    int32 limit = 4;
 }
 
-message SearchRequest {
-    string name   = 1;
-    int64 limit   = 2;
-    int64 offset  = 3;
+message {{ .service.Resources }} {
+    repeated {{ .service.Resource }} items = 1;
 }
-
-//message SearchResults {
-//  repeated User users = 1;
-//}

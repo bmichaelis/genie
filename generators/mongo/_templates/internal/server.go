@@ -2,56 +2,205 @@ package internal
 
 import (
 	"context"
+	{{ .service.Package }} "{{ .service.Package }}/generated"
+	"fmt"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/golang/protobuf/ptypes/wrappers"
+	"github.com/golang/protobuf/ptypes/timestamp"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	service "{{ .service.Package }}/generated"
-	"log"
+	"time"
 )
 
 type Server struct {
-	service.{{ .service.Resource }}Server
+	{{ .service.Package }}.AppServer
 	{{ .service.Resource }}Collection *mongo.Collection
 }
 
-func (s *Server) SayHello(ctx context.Context, req *service.HelloRequest) (*service.HelloReply, error) {
-	log.Printf("Received: %v", req.GetName())
-	name := req.GetName()
-	if name == "" {
-		name = service.HelloRequest_world.String()
+type {{ .service.Resource }} struct {
+	Id        primitive.ObjectID `bson:"_id,omitempty"`
+	Enabled   bool               `bson:"enabled"`
+	Type      int32              `bson:"type"`
+	Name      string             `bson:"name"`
+	CreatedAt *time.Time         `bson:"created_at,omitempty"`
+	UpdatedAt *time.Time         `bson:"updated_at,omitempty"`
+}
+
+func (s *Server) Create(ctx context.Context, item *{{ .service.Package }}.{{ .service.Resource }}) (*{{ .service.Package }}.Id, error) {
+	var now = time.Now()
+	var doc = {{ .service.Resource }}{
+		Enabled:   item.GetEnabled(),
+		Type:      item.GetType(),
+		Name:      item.GetName(),
+		CreatedAt: &now,
 	}
-	return &service.HelloReply{Message: "Hello, " + name}, nil
+	result, err := s.{{ .service.Resource }}Collection.InsertOne(context.Background(), doc)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &{{ .service.Package }}.Id{
+		Id: result.InsertedID.(primitive.ObjectID).Hex(),
+	}, nil
 }
 
-func (*Server) Create(ctx context.Context, req *service.User) (*wrappers.StringValue, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+func (s *Server) Get(ctx context.Context, req *{{ .service.Package }}.Id) (*{{ .service.Package }}.{{ .service.Resource }}, error) {
+	oid, err := primitive.ObjectIDFromHex(req.GetId())
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("Could not convert to ObjectId: %v", err))
+	}
+	result := s.{{ .service.Resource }}Collection.FindOne(context.Background(), bson.M{"_id": oid})
+	// Create an empty BlogItem to write our decode result to
+	data := {{ .service.Resource }}{}
+	// decode and write to data
+	if err := result.Decode(&data); err != nil {
+		return nil, status.Errorf(codes.NotFound, fmt.Sprintf("Could not find {{ .service.Resource }} with Object Id %s: %v", req.GetId(), err))
+	}
+	var createdAt *timestamp.Timestamp
+	var updatedAt *timestamp.Timestamp
+	createdAt, err = ptypes.TimestampProto(*data.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+	if data.UpdatedAt != nil {
+		updatedAt, err = ptypes.TimestampProto(*data.UpdatedAt)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	response := &{{ .service.Package }}.{{ .service.Resource }}{
+		Id:        oid.Hex(),
+		Enabled:   data.Enabled,
+		Type:      data.Type,
+		Name:      data.Name,
+		CreatedAt: createdAt,
+		UpdatedAt: updatedAt,
+	}
+
+	return response, nil
 }
 
-func (*Server) Get(ctx context.Context, req *service.Id) (*service.User, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+func (s *Server) List(ctx context.Context, criteria *{{ .service.Package }}.Criteria) (*{{ .service.Package }}.{{ .service.Resources }}, error) {
+	// collection.Find returns a cursor for our (empty) query
+	cursor, err := s.{{ .service.Resource }}Collection.Find(context.Background(), bson.M{
+		"enabled": criteria.Enabled,
+		"type":    criteria.Type,
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Unknown internal error: %v", err))
+	}
+	// An expression with defer will be called at the end of the function
+	defer cursor.Close(context.Background())
+
+	var items = make([]*{{ .service.Package }}.{{ .service.Resource }}, 0)
+	var createdAt *timestamp.Timestamp
+	var updatedAt *timestamp.Timestamp
+	// cursor.Next() returns a boolean, if false there are no more items and loop will break
+	for cursor.Next(context.Background()) {
+		var data = &{{ .service.Resource }}{}
+		// Decode the data at the current pointer and write it to data
+		err := cursor.Decode(data)
+		// check error
+		if err != nil {
+			return nil, status.Errorf(codes.Unavailable, fmt.Sprintf("Could not decode data: %v", err))
+		}
+		createdAt, err = ptypes.TimestampProto(*data.CreatedAt)
+		if err != nil {
+			return nil, status.Errorf(codes.Unavailable, fmt.Sprintf("Could not decode createdAt: %v", err))
+		}
+		if data.UpdatedAt != nil {
+			updatedAt, err = ptypes.TimestampProto(*data.UpdatedAt)
+			if err != nil {
+				return nil, status.Errorf(codes.Unavailable, fmt.Sprintf("Could not decode updatedAt: %v", err))
+			}
+		}
+
+		items = append(items, &{{ .service.Package }}.{{ .service.Resource }}{
+			Id:        data.Id.Hex(),
+			Enabled:   data.Enabled,
+			Type:      data.Type,
+			Name:      data.Name,
+			CreatedAt: createdAt,
+			UpdatedAt: updatedAt,
+		})
+	}
+	return &{{ .service.Package }}.{{ .service.Resources }}{Items: items}, nil
 }
 
-func (*Server) Search(req *service.SearchRequest, srv service.{{ .service.Resource }}_SearchServer) error {
-	return status.Errorf(codes.Unimplemented, "method Search not implemented")
+func (s *Server) Update(ctx context.Context, item *{{ .service.Package }}.{{ .service.Resource }}) (*{{ .service.Package }}.{{ .service.Resource }}, error) {
+	// Convert the Id string to a MongoDB ObjectId
+	oid, err := primitive.ObjectIDFromHex(item.GetId())
+	if err != nil {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			fmt.Sprintf("Could not convert the supplied blog id to a MongoDB ObjectId: %v", err),
+		)
+	}
+
+	// Convert the data to be updated into an unordered Bson document
+	update := bson.M{
+		"enabled":    item.GetEnabled(),
+		"type":       item.GetType(),
+		"name":       item.GetName(),
+		"updated_at": time.Now(),
+	}
+
+	// Convert the oid into an unordered bson document to search by id
+	filter := bson.M{"_id": oid}
+
+	// Result is the BSON encoded result
+	// To return the updated document instead of original we have to add options.
+	result := s.{{ .service.Resource }}Collection.FindOneAndUpdate(ctx, filter, bson.M{"$set": update}, options.FindOneAndUpdate().SetReturnDocument(1))
+
+	// Decode result and write it to 'data'
+	data := {{ .service.Resource }}{}
+	err = result.Decode(&data)
+	if err != nil {
+		return nil, status.Errorf(
+			codes.NotFound,
+			fmt.Sprintf("Could not find {{ .service.Resource }} with supplied ID: %v", err),
+		)
+	}
+	var createdAt *timestamp.Timestamp
+	var updatedAt *timestamp.Timestamp
+	createdAt, err = ptypes.TimestampProto(*data.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+	if data.UpdatedAt != nil {
+		updatedAt, err = ptypes.TimestampProto(*data.UpdatedAt)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &{{ .service.Package }}.{{ .service.Resource }}{
+		Id:        oid.Hex(),
+		Enabled:   data.Enabled,
+		Type:      data.Type,
+		Name:      data.Name,
+		CreatedAt: createdAt,
+		UpdatedAt: updatedAt,
+	}, nil
 }
 
-func (*Server) Update(ctx context.Context, req *service.User) (*empty.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
-}
-
-func (*Server) Delete(ctx context.Context, req *service.Id) (*empty.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
-}
-
-func (*Server) Restore(ctx context.Context, req *service.Id) (*empty.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Restore not implemented")
+func (s *Server) Delete(ctx context.Context, req *{{ .service.Package }}.Id) (*empty.Empty, error) {
+	oid, err := primitive.ObjectIDFromHex(req.GetId())
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("Could not convert to ObjectId: %v", err))
+	}
+	_, err = s.{{ .service.Resource }}Collection.DeleteOne(ctx, bson.M{"_id": oid})
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, fmt.Sprintf("Could not find/delete blog with id %s: %v", req.GetId(), err))
+	}
+	return &empty.Empty{}, nil
 }
 
 func (s *Server) connectToMongo() {
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://{{ .mongo.Address }}"))
 	if err != nil {
 		panic(err)
 	}
@@ -60,10 +209,10 @@ func (s *Server) connectToMongo() {
 		panic(err)
 	}
 
-	s.{{ .service.Resource  }}Collection = client.Database("{{ .mongo.Database }}").Collection("{{ .mongo.CollectionName }}")
+	s.{{ .service.Resource }}Collection = client.Database("{{ .mongo.Database }}").Collection("{{ .mongo.Collection }}")
 }
 
-func NewServer() service.{{ .service.Resource }}Server {
+func NewServer() {{ .service.Package }}.AppServer {
 	server := Server{}
 	server.connectToMongo()
 	return &server

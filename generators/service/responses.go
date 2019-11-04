@@ -8,25 +8,18 @@ import (
 	"regexp"
 )
 
-// Repository: 			https://github.com/roboncode/awesome-sauce-api (input)
-// Resource (Model):	AwesomeSauce (input)
-// Package: 			awesomesauce_api (extracted from Repository and formatted)
-// EnvVar:				AWESOME_SAUCE (formatted from Resource)
-// HttpResource:		awesome-sauce (formatted from Resource)
-// MongoCollection:		awesome_sauce (formatted from Resource)
-
 type Responses struct {
-	GoSourcePath    string
-	RepositoryPath  string // https://github.com/roboncode/awesomesauce-api (input)
-	Resource        string // AwesomeSauce (input)
-	Package         string // awesomesauce_api (extracted from Repository and formatted)
-	EnvVar          string // AWESOME_SAUCE (formatted from Resource)
-	HttpResource    string // awesome-sauce (formatted from Resource)
-	MongoCollection string // awesome_sauce (formatted from Resource)
-	DeleteDir       bool
-	GrpcPort        string
-	EnableHttp      bool
-	HttpPort        string
+	GoSourcePath   string
+	RepositoryPath string // https://github.com/roboncode/awesomesauce-api (input)
+	Resource       string // AwesomeSauce (input)
+	Resources      string // AwesomeSauces (formatted from Resource)
+	Package        string // awesomesauce_api (extracted from RepositoryPath and formatted)
+	EnvVar         string // AWESOME_SAUCE (formatted from Resource)
+	HttpResource   string // awesome-sauce (formatted from Resource)
+	DeleteDir      bool
+	GrpcPort       string
+	EnableHttp     bool
+	HttpPort       string
 }
 
 func (r *Responses) ValidateResource(val interface{}) error {

@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc"
 	"net/http"
 	"{{ .service.Package }}/api"
-	service "{{ .service.Package }}/generated"
+	{{ .service.Package }} "{{ .service.Package }}/generated"
 )
 
 type Serverer interface {
@@ -25,7 +25,7 @@ func (*Server) Serve() error {
 
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	err := service.Register{{ .service.Resource }}HandlerFromEndpoint(ctx, mux, *api.GrpcAddr, opts)
+	err := {{ .service.Package }}.RegisterAppHandlerFromEndpoint(ctx, mux, *api.GrpcAddr, opts)
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,8 @@
 package mongo
 
 import (
+	"encoding/json"
+	"fmt"
 	"genie/generators"
 	"genie/generators/service"
 	"github.com/AlecAivazis/survey/v2"
@@ -10,12 +12,12 @@ import (
 )
 
 type Responses struct {
-	Enable         bool
-	CollectionName string
-	Database       string
-	Username       string
-	Password       string
-	Port           string
+	Enable     bool
+	Collection string
+	Database   string
+	Username   string
+	Password   string
+	Address    string
 }
 
 type Survey struct {
@@ -27,7 +29,7 @@ func (s *Survey) Start() *Responses {
 
 	responses := s.Responses
 	if err := survey.AskOne(&survey.Confirm{
-		Message: "Enable mongo?",
+		Message: "Use mongo?",
 		Default: true,
 	}, &responses.Enable); err != nil {
 		panic(err)
@@ -36,35 +38,40 @@ func (s *Survey) Start() *Responses {
 	if responses.Enable {
 
 		if err := survey.AskOne(&survey.Input{
-			Message: "Database?",
+			Message: "Database name?",
+			Default: "default",
 		}, &responses.Database); err != nil {
 			panic(err)
 		}
 
 		if err := survey.AskOne(&survey.Input{
-			Message: "Username?",
+			Message: "Username? (leave empty to skip)",
 		}, &responses.Username); err != nil {
 			panic(err)
 		}
 
 		if err := survey.AskOne(&survey.Input{
-			Message: "Password?",
+			Message: "Password? (leave empty to skip)",
 		}, &responses.Password); err != nil {
 			panic(err)
 		}
 
 		if err := survey.AskOne(&survey.Input{
-			Message: "Port?",
-			Default: "27017",
-		}, &responses.Port); err != nil {
+			Message: "Mongo address?",
+			Default: "localhost:27017",
+		}, &responses.Address); err != nil {
 			panic(err)
 		}
 
 		s := generators.GetInstance().Find(service.NAME).(*service.Generator)
 		pluralResource := inflect.Pluralize(s.Responses.Resource)
-		responses.CollectionName = strings.ToLower(inflect.Underscore(pluralResource))
+		responses.Collection = strings.ToLower(inflect.Underscore(pluralResource))
 
 	}
+
+	var b, _ = json.MarshalIndent(responses, "", "   ")
+	fmt.Println("\nmongo", string(b))
+
 	return responses
 }
 
