@@ -23,11 +23,11 @@ The generated project contains the following:
 * Swagger file for HTTP endpoints
 * Ready to in local docker environment using docker compose
 * (Optional) Helm charts for Kubernetes
+* (Optional) Example CRUD using Mongo database
 
 ## Roadmap
 
 * Example unit tests
-* (Optional) Example CRUD using Mongo database
 
 ## Usage
 
@@ -56,6 +56,7 @@ Feel free to fork this project to contribute other generators.
 * [Beating JSON performance with Protobuf](https://auth0.com/blog/beating-json-performance-with-protobuf/)
 * [Part 1 -- How to develop Go gRPC microservice with HTTP/REST endpoint, middleware, Kubernetes deployment, etc.](https://medium.com/@amsokol.com/tutorial-how-to-develop-go-grpc-microservice-with-http-rest-endpoint-middleware-kubernetes-daebb36a97e9)
 * [Part 2 -- How to develop Go gRPC microservice with HTTP/REST endpoint, middleware, Kubernetes deployment, etc.](https://medium.com/@amsokol.com/tutorial-how-to-develop-go-grpc-microservice-with-http-rest-endpoint-middleware-kubernetes-af1fff81aeb2)
+* [gRPC Go Mongo Example](https://github.com/kyriediculous/go-grpc-mongodb)
 
 ## Examples
 
