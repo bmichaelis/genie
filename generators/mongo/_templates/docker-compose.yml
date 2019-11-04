@@ -6,10 +6,10 @@ services:
       - "{{ .service.GrpcPort }}:{{ .service.GrpcPort }}"
 {{if .service.EnableHttp }}      - "{{ .service.HttpPort }}:{{ .service.HttpPort }}"{{end}}
   mongo:
-{{- if .mongo.Username }}    environment:{{end}}
-{{- if .mongo.Username }}       MONGO_INITDB_ROOT_USERNAME: {{ .mongo.Username }}{{end}}
-{{- if .mongo.Password }}       MONGO_INITDB_ROOT_PASSWORD: {{ .mongo.Password }}{{end}}
-    hostname: mongodb-server
+{{ if or .mongo.Username .mongo.Password}}    environment:
+{{ if .mongo.Username }}       MONGO_INITDB_ROOT_USERNAME: {{ .mongo.Username }}{{end}}
+{{ if .mongo.Password }}       MONGO_INITDB_ROOT_PASSWORD: {{ .mongo.Password }}{{end}}
+{{end}}    hostname: mongodb-server
     image: mongo:3.4
 {{if .mongo.Address }}    ports:
       - "{{ .mongo.Port }}:27017"{{end}}
