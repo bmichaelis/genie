@@ -4,11 +4,12 @@ import (
 	"bufio"
 	"fmt"
 	"genie/util"
-	"github.com/gobuffalo/packr/v2"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"text/template"
+
+	"github.com/gobuffalo/packr/v2"
 )
 
 const NAME = "service"
@@ -124,7 +125,10 @@ func (g *Generator) printInstructions() {
 	responses := g.Responses
 	fmt.Println("\nService generation complete")
 	fmt.Println("------------------------------------------------")
+	fmt.Println("In terminal #1, to run the server...")
 	fmt.Printf("cd %s; go run cmd/main.go\n\n", responses.ServicePath())
+	fmt.Println("In terminal #2, to run the client...")
+	fmt.Printf("go run test/main.go\n\n")
 }
 
 func NewGenerator() *Generator {

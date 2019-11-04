@@ -7,11 +7,11 @@ services:
 {{if .service.EnableHttp }}      - "{{ .service.HttpPort }}:{{ .service.HttpPort }}"{{end}}
   mongo:
     environment:
-{{- if .mongo.Database }}       MONGO_INITDB_DATABASE: {{ .mongo.Database }}{{end}}
+      MONGO_INITDB_DATABASE: {{ .mongo.Database }}
 {{- if .mongo.Username }}       MONGO_INITDB_ROOT_USERNAME: {{ .mongo.Username }}{{end}}
 {{- if .mongo.Password }}       MONGO_INITDB_ROOT_PASSWORD: {{ .mongo.Password }}{{end}}
     hostname: mongodb-server
     image: mongo:3.4
-{{if .mongo.Port }}    ports:
+{{if .mongo.Address }}    ports:
       - "{{ .mongo.Port }}:27017"{{end}}
     restart: always

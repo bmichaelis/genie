@@ -200,15 +200,17 @@ func (s *Server) Delete(ctx context.Context, req *{{ .service.Package }}.Id) (*e
 }
 
 func (s *Server) connectToMongo() {
+	fmt.Print("Connecting to mongo...")
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://{{ .mongo.Address }}"))
 	if err != nil {
+		fmt.Println("error")
 		panic(err)
 	}
 	err = client.Connect(context.Background())
 	if err != nil {
 		panic(err)
 	}
-
+	fmt.Println("success")
 	s.{{ .service.Resource }}Collection = client.Database("{{ .mongo.Database }}").Collection("{{ .mongo.Collection }}")
 }
 

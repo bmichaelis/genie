@@ -3,11 +3,12 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
+	"strings"
+
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
 	"github.com/go-openapi/inflect"
-	"regexp"
-	"strings"
 )
 
 type Survey struct {
@@ -21,7 +22,7 @@ func (s *Survey) Start() *Responses {
 	// Question 1
 	var repositoryUrl string
 	if err := survey.AskOne(&survey.Input{
-		Message: "Repository Url? (ex. https://github.com/roboncode/awesome-sauce-api)",
+		Message: "Repository Url? (ex. https://github.com/roboncode/time-tracker",
 	}, &repositoryUrl); err != nil {
 		panic(err)
 	}
@@ -38,7 +39,7 @@ func (s *Survey) Start() *Responses {
 	// Question 2
 	var resource string
 	if err := survey.AskOne(&survey.Input{
-		Message: "Resource (ex. AwesomeSauce)? ",
+		Message: "Resource (ex. TimeTracker)? ",
 	}, &resource, survey.WithValidator(survey.Required), nil); err != nil {
 		panic(err)
 	}
@@ -81,6 +82,7 @@ func (s *Survey) Start() *Responses {
 
 	var b, _ = json.MarshalIndent(s.Responses, "", "   ")
 	fmt.Println("\nservice", string(b))
+	fmt.Println("Your service will be created at: ", s.Responses.ServicePath())
 
 	return s.Responses
 }
