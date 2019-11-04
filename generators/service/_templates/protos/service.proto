@@ -2,12 +2,53 @@ syntax = "proto3";
 package {{ .service.Package }};
 
 import "google/api/annotations.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+{{ if .service.EnableHttp }}import "protoc-gen-swagger/options/annotations.proto";{{end}}
+
+{{ if .service.EnableHttp }}
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+	info: {
+		title: "{{ .service.Resource }} service"
+		version: "1.0"
+		contact: {
+        name: "<< insert author name here >>"
+        url: "<< insert url here >>"
+        email: "<< insert email here >>"
+      }
+    }
+    schemes: HTTP
+    consumes: "application/json"
+    produces: "application/json"
+    responses: {
+		key: "404"
+		value: {
+			description: "Returned when the resource does not exist."
+			schema: {
+				json_schema: {
+					type: STRING
+				}
+			}
+		}
+	}
+};
+{{end}}
+
+option (gogoproto.goproto_unkeyed_all) = false;
+option (gogoproto.goproto_unrecognized_all) = false;
+option (gogoproto.goproto_sizecache_all) = false;
 
 // The greeting service definition.
 service App {
     // Sends a greeting
     rpc SayHello (HelloRequest) returns (HelloReply) {
         {{ if .service.EnableHttp }}
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+          summary: "<< insert summary here >>"
+          description: "<< insert description here >>"
+          consumes: "application/json"
+          produces: "application/json"
+        };
+
         option (google.api.http) = {
             get: "/api/{{ .service.HttpResource }}/hello"
         };
