@@ -30,7 +30,7 @@ func (s *Survey) Start() *Responses {
 	responses := s.Responses
 	if err := survey.AskOne(&survey.Confirm{
 		Message: "Use mongo?",
-		Default: true,
+		Default: false,
 	}, &responses.Enable); err != nil {
 		panic(err)
 	}
