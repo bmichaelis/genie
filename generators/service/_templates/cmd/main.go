@@ -20,7 +20,7 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 	go func() {
-		fmt.Printf("Listening to gRPC on %s\n", *api.GrpcAddr)
+		fmt.Printf("Listening to gRPC on %s\n", api.GrpcAddr)
 
 		if err := grpcServer.Serve(server); err != nil {
 			glog.Fatalln(err)
@@ -39,7 +39,7 @@ func main() {
 
 	httpServer := http.NewServer()
 	go func() {
-		fmt.Printf("Listening to HTTP on %s\n", *api.HttpAddr)
+		fmt.Printf("Listening to HTTP on %s\n", api.HttpAddr)
 		if err := httpServer.Serve(); err != nil {
 			glog.Fatalln(err)
 			<-shutdown

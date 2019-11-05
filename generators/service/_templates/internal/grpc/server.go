@@ -27,7 +27,7 @@ func (s *Server) Server() *grpc.Server {
 func (s *Server) Serve(server {{ .service.Package }}.AppServer) error {
 	defer glog.Flush()
 
-	lis, err := net.Listen("tcp", *api.GrpcAddr)
+	lis, err := net.Listen("tcp", api.GrpcAddr)
 	if err != nil {
 		return err
 	}

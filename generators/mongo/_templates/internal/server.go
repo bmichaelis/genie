@@ -3,8 +3,8 @@ package internal
 import (
 	"context"
 	{{ .service.Package }} "{{ .service.Package }}/generated"
+	"{{ .service.Package }}/tools/env"
 	"fmt"
-	"flag"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/golang/protobuf/ptypes/timestamp"
@@ -12,15 +12,17 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"time"
 )
 
 var (
-	MongoAddress = flag.String("{{ .service.EnvVar }}_MONGO_ADDR", "mongodb://{{ .mongo.Credentials }}{{ .mongo.Address }}", "mongo address")
-	MongoPingTimeout = flag.Duration("{{ .service.EnvVar }}_MONGO_PING_TIMEOUT", "2", "mongo ping timeout")
+	MongoAddress = env.String("{{ .service.EnvVar }}_MONGO_ADDR", "mongodb://{{ .mongo.Credentials }}{{ .mongo.Address }}", "mongo address")
+	MongoPingTimeout = env.Duration("{{ .service.EnvVar }}_MONGO_PING_TIMEOUT", 2, "mongo ping timeout")
 )
+
 
 type Server struct {
 	{{ .service.Package }}.AppServer
@@ -222,7 +224,7 @@ func (s *Server) Delete(ctx context.Context, req *{{ .service.Package }}.Id) (*e
 
 func (s *Server) connectToMongo() {
 	fmt.Print("Connecting to mongo... ")
-	client, err := mongo.NewClient(options.Client().ApplyURI(*MongoAddress))
+	client, err := mongo.NewClient(options.Client().ApplyURI(MongoAddress))
 	if err != nil {
 		fmt.Println("error")
 		panic(err)
@@ -231,7 +233,7 @@ func (s *Server) connectToMongo() {
 	if err != nil {
 		panic(err)
 	}
-	ctx, _ := context.WithTimeout(context.Background(), *MongoPingTimeout*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), MongoPingTimeout*time.Second)
 	err = client.Ping(ctx, readpref.Primary())
 	if err != nil {
 		fmt.Println("error... ping failed")

@@ -25,12 +25,12 @@ func (*Server) Serve() error {
 
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	err := {{ .service.Package }}.RegisterAppHandlerFromEndpoint(ctx, mux, *api.GrpcAddr, opts)
+	err := {{ .service.Package }}.RegisterAppHandlerFromEndpoint(ctx, mux, api.GrpcAddr, opts)
 	if err != nil {
 		return err
 	}
 
-	return http.ListenAndServe(*api.HttpAddr, mux)
+	return http.ListenAndServe(api.HttpAddr, mux)
 }
 
 func NewServer() Serverer {
