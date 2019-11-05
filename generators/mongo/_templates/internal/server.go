@@ -19,6 +19,7 @@ import (
 
 var (
 	MongoAddress = flag.String("{{ .service.EnvVar }}_MONGO_ADDR", "mongodb://{{ .mongo.Credentials }}{{ .mongo.Address }}", "mongo address")
+	MongoPingTimeout = flag.Duration("{{ .service.EnvVar }}_MONGO_PING_TIMEOUT", "2", "mongo ping timeout")
 )
 
 type Server struct {
@@ -230,7 +231,7 @@ func (s *Server) connectToMongo() {
 	if err != nil {
 		panic(err)
 	}
-	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), *MongoPingTimeout*time.Second)
 	err = client.Ping(ctx, readpref.Primary())
 	if err != nil {
 		fmt.Println("error... ping failed")
