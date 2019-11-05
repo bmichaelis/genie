@@ -25,8 +25,16 @@ func (g *Generator) GetName() string {
 	return NAME
 }
 
-func (g *Generator) Run() {
-	g.Responses = NewSurvey().Start()
+func (g *Generator) AskQuestions() error {
+	var err error
+	g.Responses, err = NewSurvey().Start()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *Generator) Execute() {
 	if g.Responses.Enable {
 		g.writeFiles()
 	}

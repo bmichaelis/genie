@@ -18,7 +18,7 @@ type Survey struct {
 	Responses *Responses
 }
 
-func (s *Survey) Start() *Responses {
+func (s *Survey) Start() (*Responses, error) {
 	color.Yellow("\nCharts\n------------------------------------------------------\n")
 
 	responses := s.Responses
@@ -26,39 +26,39 @@ func (s *Survey) Start() *Responses {
 		Message: "Add Kubernetes Helm Charts?",
 		Default: false,
 	}, &responses.Enable); err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	if responses.Enable {
 		if err := survey.AskOne(&survey.Input{
 			Message: "Artifactory Url?",
 		}, &responses.ArtifactoryUrl, survey.WithValidator(survey.Required)); err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		if err := survey.AskOne(&survey.Input{
 			Message: "Domain Url (ex. roboncode.com)?",
 		}, &responses.ArtifactoryUrl, survey.WithValidator(survey.Required)); err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		if err := survey.AskOne(&survey.Input{
 			Message: "Author's name?",
 		}, &responses.Author, survey.WithValidator(survey.Required)); err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		if err := survey.AskOne(&survey.Input{
 			Message: "Author's email?",
 		}, &responses.Email, survey.WithValidator(survey.Required)); err != nil {
-			panic(err)
+			return nil, err
 		}
 	}
 
 	var b, _ = json.MarshalIndent(responses, "", "   ")
 	fmt.Println("\ncharts", string(b))
 
-	return responses
+	return responses, nil
 }
 
 func NewSurvey() *Survey {

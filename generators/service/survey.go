@@ -15,16 +15,16 @@ type Survey struct {
 	Responses *Responses
 }
 
-func (s *Survey) Start() *Responses {
+func (s *Survey) Start() (*Responses, error) {
 	color.Yellow("\nService\n------------------------------------------------------\n")
 	var resp = s.Responses
 
 	// Question 1
 	var repositoryUrl string
 	if err := survey.AskOne(&survey.Input{
-		Message: "Repository Url? (ex. https://github.com/roboncode/time-tracker",
-	}, &repositoryUrl); err != nil {
-		panic(err)
+		Message: "Repository Url? (ex. https://github.com/roboncode/time-tracker)",
+	}, &repositoryUrl, survey.WithValidator(survey.Required)); err != nil {
+		return nil, err
 	}
 
 	r1, _ := regexp.Compile("^(https?://)?")
@@ -41,7 +41,7 @@ func (s *Survey) Start() *Responses {
 	if err := survey.AskOne(&survey.Input{
 		Message: "Resource (ex. TimeTracker)? ",
 	}, &resource, survey.WithValidator(survey.Required), nil); err != nil {
-		panic(err)
+		return nil, err
 	}
 	singleResource := inflect.Singularize(resource)
 	pluralResource := inflect.Pluralize(resource)
@@ -54,21 +54,21 @@ func (s *Survey) Start() *Responses {
 		Message: fmt.Sprintf("Delete directory if exists (%s)", s.Responses.ServicePath()),
 		Default: false,
 	}, &s.Responses.DeleteDir); err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	if err := survey.AskOne(&survey.Input{
 		Message: "gRPC port?",
 		Default: "8080",
 	}, &s.Responses.GrpcPort); err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	if err := survey.AskOne(&survey.Confirm{
 		Message: "Enable HTTP endpoint?",
 		Default: true,
 	}, &s.Responses.EnableHttp); err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	if s.Responses.EnableHttp {
@@ -76,15 +76,14 @@ func (s *Survey) Start() *Responses {
 			Message: "HTTP port?",
 			Default: "3000",
 		}, &s.Responses.HttpPort); err != nil {
-			panic(err)
+			return nil, err
 		}
 	}
 
 	var b, _ = json.MarshalIndent(s.Responses, "", "   ")
 	fmt.Println("\nservice", string(b))
-	fmt.Println("Your service will be created at: ", s.Responses.ServicePath())
 
-	return s.Responses
+	return s.Responses, nil
 }
 
 func NewSurvey() *Survey {

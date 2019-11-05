@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"genie/util"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"text/template"
 
@@ -24,34 +23,18 @@ func (g *Generator) GetName() string {
 	return NAME
 }
 
-func (g *Generator) Run() {
-	g.printHeader()
-	g.Responses = NewSurvey().Start()
+func (g *Generator) AskQuestions() error {
+	var err error
+	g.Responses, err = NewSurvey().Start()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *Generator) Execute() {
 	g.deleteDir()
 	g.writeFiles()
-}
-
-func (g *Generator) Finalize() {
-	g.setWorkingDir()
-	g.changeFileMode()
-	// g.execGoModule111()
-	// g.execGoModVendor()
-	g.execGoGenerate()
-	g.execGoFmt()
-	g.printInstructions()
-}
-
-func (*Generator) printHeader() {
-	header := util.NewHeader()
-	header.Print()
-}
-
-func (g *Generator) setWorkingDir() {
-	responses := g.Responses
-	path := responses.ServicePath()
-	if err := os.Chdir(path); err != nil {
-		panic(err)
-	}
 }
 
 func (g *Generator) deleteDir() {
@@ -96,62 +79,6 @@ func (g *Generator) writeFiles() {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func (*Generator) changeFileMode() {
-	cmd := exec.Command("chmod", "+x", "generate.sh")
-	if err := cmd.Run(); err != nil {
-		panic(err)
-	}
-}
-
-func (*Generator) execGoModule111() {
-	s := terminal.ShowBusy("export GOMODULE111=on...")
-	cmd := exec.Command("export", "GOMODULE111=on")
-	if err := cmd.Run(); err != nil {
-		panic(err)
-	}
-	s.Stop()
-}
-
-func (*Generator) execGoModVendor() {
-	s := terminal.ShowBusy("go mod vendor...")
-	cmd := exec.Command("go", "mod", "vendor")
-	if err := cmd.Run(); err != nil {
-		panic(err)
-	}
-	s.Stop()
-}
-
-func (*Generator) execGoGenerate() {
-	s := terminal.ShowBusy("go generate...")
-	cmd := exec.Command("go", "generate")
-	if err := cmd.Run(); err != nil {
-		panic(err)
-	}
-	s.Stop()
-}
-
-func (*Generator) execGoFmt() {
-	s := terminal.ShowBusy("go fmt")
-	cmd := exec.Command("go", "fmt", "./...")
-	if err := cmd.Run(); err != nil {
-		panic(err)
-	}
-	s.Stop()
-}
-
-func (g *Generator) printInstructions() {
-	responses := g.Responses
-	fmt.Println("\nService generation complete")
-	fmt.Println("------------------------------------------------")
-	fmt.Println("In terminal #1, to run the server...")
-	fmt.Printf("cd %s\n", responses.ServicePath())
-	fmt.Printf("export GOMODULE111=on\n")
-	fmt.Printf("go mod vendor\n")
-	fmt.Printf("go run cmd/main.go\n\n")
-	fmt.Println("In terminal #2, to run the client...")
-	fmt.Printf("go run test/main.go\n\n")
 }
 
 func NewGenerator() *Generator {

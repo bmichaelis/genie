@@ -28,7 +28,7 @@ type Survey struct {
 	Responses *Responses
 }
 
-func (s *Survey) Start() *Responses {
+func (s *Survey) Start() (*Responses, error) {
 	color.Yellow("\nMongo\n------------------------------------------------------\n")
 
 	responses := s.Responses
@@ -36,7 +36,7 @@ func (s *Survey) Start() *Responses {
 		Message: "Use mongo?",
 		Default: false,
 	}, &responses.Enable); err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	if responses.Enable {
@@ -45,20 +45,20 @@ func (s *Survey) Start() *Responses {
 			Message: "Database name?",
 			Default: "default",
 		}, &responses.Database); err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		if err := survey.AskOne(&survey.Input{
 			Message: "Username? (leave empty to skip)",
 		}, &responses.Username); err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		if responses.Username != "" {
 			if err := survey.AskOne(&survey.Input{
 				Message: "Password? (required)",
 			}, &responses.Password); err != nil {
-				panic(err)
+				return nil, err
 			}
 			responses.Credentials = fmt.Sprintf("%s:%s@", responses.Username, responses.Password)
 		}
@@ -67,7 +67,7 @@ func (s *Survey) Start() *Responses {
 			Message: "Mongo address?",
 			Default: "localhost:27017",
 		}, &responses.Address); err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		r, _ := regexp.Compile("\\d+")
@@ -81,7 +81,7 @@ func (s *Survey) Start() *Responses {
 	var b, _ = json.MarshalIndent(responses, "", "   ")
 	fmt.Println("\nmongo", string(b))
 
-	return responses
+	return responses, nil
 }
 
 func NewSurvey() *Survey {
