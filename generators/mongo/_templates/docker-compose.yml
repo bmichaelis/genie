@@ -1,10 +1,12 @@
 version: '3'
 services:
   app:
-    build: ""
+    build: .
     ports:
       - "{{ .service.GrpcPort }}:{{ .service.GrpcPort }}"
 {{if .service.EnableHttp }}      - "{{ .service.HttpPort }}:{{ .service.HttpPort }}"{{end}}
+    depends_on:
+      - mongo
   mongo:
 {{ if or .mongo.Username .mongo.Password}}    environment:
 {{ if .mongo.Username }}       MONGO_INITDB_ROOT_USERNAME: {{ .mongo.Username }}{{end}}
