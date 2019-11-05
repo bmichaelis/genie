@@ -4,6 +4,7 @@ import (
 	"context"
 	{{ .service.Package }} "{{ .service.Package }}/generated"
 	"fmt"
+	"flag"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/golang/protobuf/ptypes/timestamp"
@@ -14,6 +15,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"time"
+)
+
+var (
+	MongoAddress = flag.String("{{ .service.EnvVar }}_MONGO_ADDR", "mongodb://{{ .mongo.Credentials }}{{ .mongo.Address }}", "mongo address")
 )
 
 type Server struct {
@@ -216,7 +221,7 @@ func (s *Server) Delete(ctx context.Context, req *{{ .service.Package }}.Id) (*e
 
 func (s *Server) connectToMongo() {
 	fmt.Print("Connecting to mongo...")
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://{{ .mongo.Address }}"))
+	client, err := mongo.NewClient(options.Client().ApplyURI(*MongoAddress))
 	if err != nil {
 		fmt.Println("error")
 		panic(err)

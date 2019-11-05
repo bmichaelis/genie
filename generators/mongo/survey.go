@@ -14,13 +14,14 @@ import (
 )
 
 type Responses struct {
-	Enable     bool
-	Collection string
-	Database   string
-	Username   string
-	Password   string
-	Address    string
-	Port       string
+	Enable      bool
+	Collection  string
+	Database    string
+	Credentials string
+	Username    string
+	Password    string
+	Address     string
+	Port        string
 }
 
 type Survey struct {
@@ -53,10 +54,13 @@ func (s *Survey) Start() *Responses {
 			panic(err)
 		}
 
-		if err := survey.AskOne(&survey.Input{
-			Message: "Password? (leave empty to skip)",
-		}, &responses.Password); err != nil {
-			panic(err)
+		if responses.Username != "" {
+			if err := survey.AskOne(&survey.Input{
+				Message: "Password? (required)",
+			}, &responses.Password); err != nil {
+				panic(err)
+			}
+			responses.Credentials = fmt.Sprintf("%s:%s@", responses.Username, responses.Password)
 		}
 
 		if err := survey.AskOne(&survey.Input{
