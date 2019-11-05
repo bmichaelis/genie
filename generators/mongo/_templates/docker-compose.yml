@@ -5,6 +5,8 @@ services:
     ports:
       - "{{ .service.GrpcPort }}:{{ .service.GrpcPort }}"
 {{if .service.EnableHttp }}      - "{{ .service.HttpPort }}:{{ .service.HttpPort }}"{{end}}
+    environment:
+      - {{ .service.EnvVar }}_MONGO_ADDR=mongodb://{{ .mongo.Credentials }}mongo:{{ .mongo.Port }}
     depends_on:
       - mongo
   mongo:
