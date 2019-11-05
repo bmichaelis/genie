@@ -220,7 +220,7 @@ func (s *Server) Delete(ctx context.Context, req *{{ .service.Package }}.Id) (*e
 }
 
 func (s *Server) connectToMongo() {
-	fmt.Print("Connecting to mongo...")
+	fmt.Print("Connecting to mongo... ")
 	client, err := mongo.NewClient(options.Client().ApplyURI(*MongoAddress))
 	if err != nil {
 		fmt.Println("error")
@@ -230,6 +230,13 @@ func (s *Server) connectToMongo() {
 	if err != nil {
 		panic(err)
 	}
+	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
+	err = client.Ping(ctx, readpref.Primary())
+	if err != nil {
+		fmt.Println("error... ping failed")
+		panic(err)
+	}
+
 	fmt.Println("success")
 	s.{{ .service.Resource }}Collection = client.Database("{{ .mongo.Database }}").Collection("{{ .mongo.Collection }}")
 }
